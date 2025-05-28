@@ -33,6 +33,8 @@ public class PlayerMove : MonoBehaviour
 	private float m_verticalVelocity;
 	private float m_turnVelocity;
 	private bool m_GroundedPrev;
+
+	private bool m_canMove;
 	
 
 	private void Awake()
@@ -47,11 +49,18 @@ public class PlayerMove : MonoBehaviour
 			m_targetCamera = Camera.main;
 		}
 	}
+	private void Start()
+	{
+		m_canMove = true;
+	}
 
 	public void OnEnable()
 	{
 		m_playerInput.actions["Move"].performed += OnMove;
-		m_playerInput.actions["Move"].performed += OnMoveCancel;
+		m_playerInput.actions["Move"].canceled += OnMoveCancel;
+
+		m_playerInput.actions["Attack"].performed += OnAttack;
+		//m_playerInput.actions["Attack"].canceled += OnAttackCancel;
 
 		//playerInput.actions["Jump"].performed += OnJump;
 	}
@@ -59,7 +68,10 @@ public class PlayerMove : MonoBehaviour
 	private void OnDisable()
 	{
 		m_playerInput.actions["Move"].performed -= OnMove;
-		m_playerInput.actions["Move"].performed -= OnMoveCancel;
+		m_playerInput.actions["Move"].canceled -= OnMoveCancel;
+
+		m_playerInput.actions["Attack"].performed -= OnAttack;
+		//m_playerInput.actions["Attack"].canceled -= OnAttackCancel;
 
 		//playerInput.actions["Jump"].performed -= OnJump;
 	}
@@ -69,14 +81,15 @@ public class PlayerMove : MonoBehaviour
 	{
 		// ì¸óÕílÇ…ï€éùÇµÇƒÇ®Ç≠
 		m_inputMove = context.ReadValue<Vector2>();
-		m_animator.SetBool("Run", false);
+		m_animator.SetBool("Run", true);
+		m_canMove = false;
 	}
 
 	public void OnMoveCancel(InputAction.CallbackContext context)
 	{
 		//ì¸óÕílÇï€éùÇµÇƒÇ®Ç≠Å@
 		m_inputMove = context.ReadValue<Vector2>();
-		m_animator.SetBool("Run", true);
+		m_animator.SetBool("Run", false);
 	}
 
 	public void OnJump(InputAction.CallbackContext context)
@@ -88,8 +101,25 @@ public class PlayerMove : MonoBehaviour
 		m_verticalVelocity = m_jumpSpeed;
 	}
 
+	public void OnAttack(InputAction.CallbackContext context)
+	{
+		m_animator.SetTrigger("Attack");
+	}
+
+	//public void OnAttackCancel(InputAction.CallbackContext context)
+	//{
+	//	m_animator.ResetTrigger("Idle");
+	//}
+
+	public void ResetTrigger()
+	{
+		m_canMove = true;
+		m_animator.ResetTrigger("Attack");
+	}
+
 	private void FixedUpdate()
     {
+
         var isGrounded = m_characterController.isGrounded;
 
 		if (isGrounded && !m_GroundedPrev)
