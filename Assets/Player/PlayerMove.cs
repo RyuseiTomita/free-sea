@@ -24,22 +24,25 @@ public class PlayerMove : MonoBehaviour
 	[Header("カメラ"), SerializeField]
 	private Camera m_targetCamera;
 
+	private Animator m_animator;
 	private Transform m_transform;
 	private CharacterController m_characterController;
-	private PlayerInput playerInput;
+	private PlayerInput m_playerInput;
 
 	private Vector2 m_inputMove;
 	private float m_verticalVelocity;
 	private float m_turnVelocity;
 	private bool m_GroundedPrev;
+	
 
 	private void Awake()
-	{
+	{	
 		m_transform = transform;
 		m_characterController = GetComponent<CharacterController>();
-		playerInput = GetComponent<PlayerInput>();
+		m_playerInput = GetComponent<PlayerInput>();
+		m_animator = GetComponent<Animator>();
 
-		if(m_targetCamera == null)
+		if (m_targetCamera == null)
 		{
 			m_targetCamera = Camera.main;
 		}
@@ -47,16 +50,16 @@ public class PlayerMove : MonoBehaviour
 
 	public void OnEnable()
 	{
-		playerInput.actions["Move"].performed += OnMove;
-		playerInput.actions["Move"].performed += OnMoveCancel;
+		m_playerInput.actions["Move"].performed += OnMove;
+		m_playerInput.actions["Move"].performed += OnMoveCancel;
 
 		//playerInput.actions["Jump"].performed += OnJump;
 	}
 
 	private void OnDisable()
 	{
-		playerInput.actions["Move"].performed -= OnMove;
-		playerInput.actions["Move"].performed -= OnMoveCancel;
+		m_playerInput.actions["Move"].performed -= OnMove;
+		m_playerInput.actions["Move"].performed -= OnMoveCancel;
 
 		//playerInput.actions["Jump"].performed -= OnJump;
 	}
@@ -66,12 +69,14 @@ public class PlayerMove : MonoBehaviour
 	{
 		// 入力値に保持しておく
 		m_inputMove = context.ReadValue<Vector2>();
+		m_animator.SetBool("Run", false);
 	}
 
 	public void OnMoveCancel(InputAction.CallbackContext context)
 	{
 		//入力値を保持しておく　
-		m_inputMove = context.ReadValue<Vector2>();　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
+		m_inputMove = context.ReadValue<Vector2>();
+		m_animator.SetBool("Run", true);
 	}
 
 	public void OnJump(InputAction.CallbackContext context)
