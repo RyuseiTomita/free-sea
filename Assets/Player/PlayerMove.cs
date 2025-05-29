@@ -24,6 +24,8 @@ public class PlayerMove : MonoBehaviour
 	[Header("ÉJÉÅÉâ"), SerializeField]
 	private Camera m_targetCamera;
 
+	[SerializeField] AudioClip[] m_clip;
+
 	private Animator m_animator;
 	private Transform m_transform;
 	private CharacterController m_characterController;
@@ -115,6 +117,21 @@ public class PlayerMove : MonoBehaviour
 	{
 		m_canMove = true;
 		m_animator.ResetTrigger("Attack");
+	}
+
+	public void SwordAudio1()
+	{
+		SoundEffect.Play2D(m_clip[0]);
+	}
+
+	public void SwordAudio2()
+	{
+		SoundEffect.Play2D(m_clip[1]);
+	}
+
+	public void SwordAudio3()
+	{
+		SoundEffect.Play2D(m_clip[2]);
 	}
 
 	private void FixedUpdate()
