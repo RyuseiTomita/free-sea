@@ -29,6 +29,9 @@ public class PlayerMove : MonoBehaviour
 	[SerializeField] float m_chargeSkill;
 	[SerializeField] const float MaxSkillCharge = 3f;
 
+	[SerializeField] GameObject[] m_effect;
+	[SerializeField] GameObject[] m_sword;
+
 	private Animator m_animator;
 	private Transform m_transform;
 	private CharacterController m_characterController;
@@ -119,8 +122,17 @@ public class PlayerMove : MonoBehaviour
 
 	public void OnAttack(InputAction.CallbackContext context)
 	{
-		m_animator.SetTrigger("Attack");
-		m_canMove = false;
+		if(!m_awakening)
+		{
+			m_animator.SetTrigger("Attack");
+			m_canMove = false;
+		}
+		else
+		{
+			m_animator.SetTrigger("SkillSword");
+			m_canMove = false;
+		}
+		
 	}
 
 	public void OnChargeAttack(InputAction.CallbackContext context)
@@ -131,12 +143,14 @@ public class PlayerMove : MonoBehaviour
 		m_chargeAttack = true;
 		m_animator.SetBool("ChargeSkill", true);
 		SoundEffect.Play2D(m_clip[3]);
+		m_effect[0].SetActive(true);
 	}
 
 	public void OnChargeAttackCansel(InputAction.CallbackContext context)
 	{
 		m_chargeAttack = false;
 		m_animator.SetBool("ChargeSkill", false);
+		m_effect[0].SetActive(false);
 	}
 
 
@@ -144,6 +158,7 @@ public class PlayerMove : MonoBehaviour
 	{
 		m_canMove = true;
 		m_animator.ResetTrigger("Attack");
+		m_animator.ResetTrigger("SkillSword");
 	}
 
 	public void SwordAudio1()
@@ -172,6 +187,8 @@ public class PlayerMove : MonoBehaviour
 
 	private void FixedUpdate()
     {
+		//Debug.Log(m_awakening);
+
 		if(m_chargeAttack && !m_awakening)
 		{
 			m_chargeSkill -= Time.deltaTime;
@@ -181,6 +198,11 @@ public class PlayerMove : MonoBehaviour
 				m_awakening = true;
 				SkillActivation();
 				m_chargeSkill = MaxSkillCharge;
+				m_effect[0].SetActive(false);
+				m_effect[1].SetActive(true);
+
+				m_sword[0].SetActive(false);
+				m_sword[1].SetActive(true);
 			}
 		}
 		else
