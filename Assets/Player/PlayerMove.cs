@@ -26,6 +26,9 @@ public class PlayerMove : MonoBehaviour
 
 	[SerializeField] AudioClip[] m_clip;
 
+	[SerializeField] float m_chargeSkill;
+	[SerializeField] const float MaxSkillCharge = 3f;
+
 	private Animator m_animator;
 	private Transform m_transform;
 	private CharacterController m_characterController;
@@ -36,11 +39,12 @@ public class PlayerMove : MonoBehaviour
 	private float m_turnVelocity;
 	private bool m_GroundedPrev;
 
-	private bool m_canMove;
-	
+	private bool m_canMove; // プレイヤーを動かせれるか
+	private bool m_chargeAttack; // スキルチャージ中
+	private bool m_awakening;	 // スキル発動
 
 	private void Awake()
-	{	
+	{
 		m_transform = transform;
 		m_characterController = GetComponent<CharacterController>();
 		m_playerInput = GetComponent<PlayerInput>();
@@ -50,6 +54,9 @@ public class PlayerMove : MonoBehaviour
 		{
 			m_targetCamera = Camera.main;
 		}
+
+		m_chargeAttack = false;
+		m_awakening = false;
 	}
 	private void Start()
 	{
@@ -62,6 +69,9 @@ public class PlayerMove : MonoBehaviour
 		m_playerInput.actions["Move"].canceled += OnMoveCancel;
 
 		m_playerInput.actions["Attack"].performed += OnAttack;
+		m_playerInput.actions["ChargeAttack"].performed += OnChargeAttack;
+		m_playerInput.actions["ChargeAttack"].canceled += OnChargeAttackCansel;
+
 		//m_playerInput.actions["Attack"].canceled += OnAttackCancel;
 
 		//playerInput.actions["Jump"].performed += OnJump;
@@ -72,7 +82,10 @@ public class PlayerMove : MonoBehaviour
 		m_playerInput.actions["Move"].performed -= OnMove;
 		m_playerInput.actions["Move"].canceled -= OnMoveCancel;
 
-		m_playerInput.actions["Attack"].performed -= OnAttack;
+		m_playerInput.actions["ChargeAttack"].performed -= OnChargeAttack;
+		//m_playerInput.actions["Attack"].performed -= OnAttack;
+
+
 		//m_playerInput.actions["Attack"].canceled -= OnAttackCancel;
 
 		//playerInput.actions["Jump"].performed -= OnJump;
@@ -81,10 +94,11 @@ public class PlayerMove : MonoBehaviour
 
 	public void OnMove(InputAction.CallbackContext context)
 	{
+		if (!m_canMove) return;
+
 		// 入力値に保持しておく
 		m_inputMove = context.ReadValue<Vector2>();
 		m_animator.SetBool("Run", true);
-		m_canMove = false;
 	}
 
 	public void OnMoveCancel(InputAction.CallbackContext context)
@@ -106,12 +120,25 @@ public class PlayerMove : MonoBehaviour
 	public void OnAttack(InputAction.CallbackContext context)
 	{
 		m_animator.SetTrigger("Attack");
+		m_canMove = false;
 	}
 
-	//public void OnAttackCancel(InputAction.CallbackContext context)
-	//{
-	//	m_animator.ResetTrigger("Idle");
-	//}
+	public void OnChargeAttack(InputAction.CallbackContext context)
+	{
+		// スキルチャージ中かつ動いていないとき
+		if (m_awakening || !m_canMove) return;
+
+		m_chargeAttack = true;
+		m_animator.SetBool("ChargeSkill", true);
+		SoundEffect.Play2D(m_clip[3]);
+	}
+
+	public void OnChargeAttackCansel(InputAction.CallbackContext context)
+	{
+		m_chargeAttack = false;
+		m_animator.SetBool("ChargeSkill", false);
+	}
+
 
 	public void ResetTrigger()
 	{
@@ -134,10 +161,36 @@ public class PlayerMove : MonoBehaviour
 		SoundEffect.Play2D(m_clip[2]);
 	}
 
+	private void SkillActivation() // スキル発動
+	{
+		float speedUp = 3f;
+
+		SoundEffect.Play2D(m_clip[4]);
+
+		m_speed += speedUp;
+	}
+
 	private void FixedUpdate()
     {
+		if(m_chargeAttack && !m_awakening)
+		{
+			m_chargeSkill -= Time.deltaTime;
 
-        var isGrounded = m_characterController.isGrounded;
+			if(m_chargeSkill <= 0)
+			{
+				m_awakening = true;
+				SkillActivation();
+				m_chargeSkill = MaxSkillCharge;
+			}
+		}
+		else
+		{
+			m_chargeSkill = MaxSkillCharge;
+		}
+
+		if (!m_canMove || m_chargeAttack) return;
+
+			var isGrounded = m_characterController.isGrounded;
 
 		if (isGrounded && !m_GroundedPrev)
 		{
@@ -174,6 +227,8 @@ public class PlayerMove : MonoBehaviour
 		// 現フレームの移動量を移動速度から計算
 		var moveDelta = moveVelocity * Time.deltaTime;
 
+		
+
 		// CharactorControllerに移動量を指定し、オブジェクトを動かす
 		m_characterController.Move(moveDelta);
 
@@ -194,9 +249,8 @@ public class PlayerMove : MonoBehaviour
 				ref m_turnVelocity,
 				0.1f
 			);
-
 			// オブジェクトの回転を更新
 			m_transform.rotation = Quaternion.Euler(0, angleY, 0);
-		}	
+		}
 	}
 }

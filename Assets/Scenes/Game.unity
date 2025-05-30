@@ -1013,6 +1013,21 @@ PrefabInstance:
       propertyPath: m_targetCamera
       value: 
       objectReference: {fileID: 330585545}
+    - target: {fileID: 5934532361179560349, guid: 127e8c0cec25c45428b862bfe501ea40,
+        type: 3}
+      propertyPath: m_clip.Array.size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5934532361179560349, guid: 127e8c0cec25c45428b862bfe501ea40,
+        type: 3}
+      propertyPath: m_clip.Array.data[3]
+      value: 
+      objectReference: {fileID: 8300000, guid: ba3d5a74d6757e9469ef9bd63c2f3c55, type: 3}
+    - target: {fileID: 5934532361179560349, guid: 127e8c0cec25c45428b862bfe501ea40,
+        type: 3}
+      propertyPath: m_clip.Array.data[4]
+      value: 
+      objectReference: {fileID: 8300000, guid: 424cffc700abb0a449b9ff39a27288ef, type: 3}
     - target: {fileID: 5963401009742446876, guid: 127e8c0cec25c45428b862bfe501ea40,
         type: 3}
       propertyPath: m_Name
