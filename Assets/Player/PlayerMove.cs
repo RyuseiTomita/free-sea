@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,6 +9,8 @@ public class PlayerMove : MonoBehaviour
 {
 	[Header("移動の速さ"), SerializeField]
 	private float m_speed = 6.0f;
+
+	[SerializeField] const float NormalSpeed = 6;
 
 	[Header("ジャンプする瞬間の速さ"), SerializeField]
 	private float m_jumpSpeed = 30.0f;
@@ -25,14 +28,18 @@ public class PlayerMove : MonoBehaviour
 	private Camera m_targetCamera;
 
 	[SerializeField] AudioClip[] m_clip;
+	[SerializeField] AudioClip m_chargeSkillSound;
 
-	[SerializeField] float m_chargeSkill;
+	[SerializeField] float m_chargeSkill; // 発動までの時間
 	[SerializeField] const float MaxSkillCharge = 3f;
+	[SerializeField] float m_skillActivation;   // 発動時間
+	[SerializeField] const float MaxSkillActivation = 15f;
 
 	[SerializeField] GameObject[] m_effect;
 	[SerializeField] GameObject[] m_sword;
 
 	private Animator m_animator;
+	private AudioSource audioSource;
 	private Transform m_transform;
 	private CharacterController m_characterController;
 	private PlayerInput m_playerInput;
@@ -52,6 +59,7 @@ public class PlayerMove : MonoBehaviour
 		m_characterController = GetComponent<CharacterController>();
 		m_playerInput = GetComponent<PlayerInput>();
 		m_animator = GetComponent<Animator>();
+		audioSource = GetComponent<AudioSource>();
 
 		if (m_targetCamera == null)
 		{
@@ -64,6 +72,7 @@ public class PlayerMove : MonoBehaviour
 	private void Start()
 	{
 		m_canMove = true;
+		NormalTime();
 	}
 
 	public void OnEnable()
@@ -137,19 +146,20 @@ public class PlayerMove : MonoBehaviour
 
 	public void OnChargeAttack(InputAction.CallbackContext context)
 	{
-		// スキルチャージ中かつ動いていないとき
+		// スキルチャージ中または動いていないとき
 		if (m_awakening || !m_canMove) return;
 
 		m_chargeAttack = true;
 		m_animator.SetBool("ChargeSkill", true);
-		SoundEffect.Play2D(m_clip[3]);
+		audioSource.Play();
 		m_effect[0].SetActive(true);
 	}
 
 	public void OnChargeAttackCansel(InputAction.CallbackContext context)
 	{
 		m_chargeAttack = false;
-		m_animator.SetBool("ChargeSkill", false);
+		m_animator.SetBool("ChargeSkill", false); 
+		audioSource.Stop();
 		m_effect[0].SetActive(false);
 	}
 
@@ -178,36 +188,61 @@ public class PlayerMove : MonoBehaviour
 
 	private void SkillActivation() // スキル発動
 	{
-		float speedUp = 3f;
+		float speedUp = 4f;
 
-		SoundEffect.Play2D(m_clip[4]);
+		SoundEffect.Play2D(m_clip[3]);
+		
 
 		m_speed += speedUp;
+
+		m_effect[0].SetActive(false);
+		m_effect[1].SetActive(true);
+		m_effect[2].SetActive(true);
+
+		m_sword[0].SetActive(false);
+		m_sword[1].SetActive(true);
+	}
+
+	private void NormalTime()
+	{
+		m_speed = NormalSpeed;
+		m_sword[0].SetActive(true);
+		m_sword[1].SetActive(false);
+
+		m_effect[2].SetActive(false);
 	}
 
 	private void FixedUpdate()
     {
-		//Debug.Log(m_awakening);
+		Debug.Log(m_awakening);
 
-		if(m_chargeAttack && !m_awakening)
+		if(m_chargeAttack && !m_awakening) // チャージ中かつまだ発動していないとき
 		{
 			m_chargeSkill -= Time.deltaTime;
 
 			if(m_chargeSkill <= 0)
 			{
 				m_awakening = true;
-				SkillActivation();
+				SkillActivation();				// 発動
 				m_chargeSkill = MaxSkillCharge;
-				m_effect[0].SetActive(false);
-				m_effect[1].SetActive(true);
-
-				m_sword[0].SetActive(false);
-				m_sword[1].SetActive(true);
 			}
 		}
 		else
 		{
 			m_chargeSkill = MaxSkillCharge;
+		}
+
+		if(m_awakening) // 発動中
+		{
+			m_skillActivation -= Time.deltaTime;
+
+			if(m_skillActivation <= 0)
+			{
+				m_awakening = false;
+				m_effect[1].SetActive(false);
+				NormalTime();
+				m_skillActivation = MaxSkillActivation;
+			}
 		}
 
 		if (!m_canMove || m_chargeAttack) return;
