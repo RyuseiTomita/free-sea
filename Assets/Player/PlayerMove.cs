@@ -37,6 +37,8 @@ public class PlayerMove : MonoBehaviour
 
 	[SerializeField] GameObject[] m_effect;
 	[SerializeField] GameObject[] m_sword;
+	[SerializeField] GameObject m_skillImage;
+	[SerializeField] GameObject m_skillUi;
 
 	private Animator m_animator;
 	private AudioSource audioSource;
@@ -188,6 +190,8 @@ public class PlayerMove : MonoBehaviour
 
 	private void SkillActivation() // スキル発動
 	{
+		m_skillUi.SetActive(false);
+		m_skillImage.GetComponent<SkillTimer>().CoolDown(true);
 		float speedUp = 4f;
 
 		SoundEffect.Play2D(m_clip[3]);
@@ -205,17 +209,17 @@ public class PlayerMove : MonoBehaviour
 
 	private void NormalTime()
 	{
+		
 		m_speed = NormalSpeed;
 		m_sword[0].SetActive(true);
 		m_sword[1].SetActive(false);
 
 		m_effect[2].SetActive(false);
+		m_skillImage.GetComponent<SkillTimer>().CoolDown(false);
 	}
 
 	private void FixedUpdate()
     {
-		Debug.Log(m_awakening);
-
 		if(m_chargeAttack && !m_awakening) // チャージ中かつまだ発動していないとき
 		{
 			m_chargeSkill -= Time.deltaTime;
@@ -235,7 +239,7 @@ public class PlayerMove : MonoBehaviour
 		if(m_awakening) // 発動中
 		{
 			m_skillActivation -= Time.deltaTime;
-
+			
 			if(m_skillActivation <= 0)
 			{
 				m_awakening = false;
