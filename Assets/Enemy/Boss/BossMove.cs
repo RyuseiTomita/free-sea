@@ -6,36 +6,43 @@ using UnityEngine.InputSystem.iOS;
 
 public class BossMove : MonoBehaviour
 {
-	[SerializeField] GameObject m_player; // プレイヤーに追従
+	[SerializeField] Transform m_player; // プレイヤーに追従
 	[SerializeField] GameObject[] m_effect;
 	[SerializeField] AudioClip[] m_clip;
 
 	// 魔法攻撃
-	[SerializeField] float m_magicAttackTime; 
+	[SerializeField] float m_magicAttackTime;
 	private const float MaxMagicAttackTime = 60f;
 	private bool m_magicAttack;
 	[SerializeField] float m_magicCoolDown; // 間隔
 
 	// 弾の数
 	[SerializeField] int m_magicNumber; // 魔法陣の順番
-	private int m_magicNumberBomb;		// 爆弾の順番
-	private const int  MaxMagicNumber = 5;
+	private int m_magicNumberBomb;      // 爆弾の順番
+	private const int MaxMagicNumber = 5;
 	private GameObject[] m_magicAttackEffect = new GameObject[10];
 
 	//　骸骨の召喚
-	[SerializeField] GameObject m_skelton;  
-	private const int MaxskeltonSpawn = 3;
-	[SerializeField] Transform[] m_pos;
+	[SerializeField] GameObject m_skelton;
+	[SerializeField] Transform[] m_skeltonpos;   // 骸骨のポジション
+	//private bool m_skeltonSpawn;
+
+	// 呪いの攻撃
+	[SerializeField] GameObject[] m_skeltonHead; // 骸骨の頭
+	[SerializeField] GameObject m_curseEffect;
+	[SerializeField] Transform[] m_cursePos;
 
 	[SerializeField] float m_idleTime; // 何もしない時間
 
 	private int m_bossAttackPattern = 0; // 攻撃パターン
 
+	//private bool m_isMove; // 敵が動いているか
+
 
 	private Animator m_animator;
 
-    void Start()
-    {
+	void Start()
+	{
 		m_magicNumber = 0;
 		m_magicNumberBomb = 0;
 
@@ -43,33 +50,42 @@ public class BossMove : MonoBehaviour
 
 		m_animator = GetComponent<Animator>();
 		m_magicAttack = false;
-    }
+		//m_skeltonSpawn = false;
+		//m_isMove = false;
+	}
 
- 
-    void FixedUpdate()
-    {
+
+	void FixedUpdate()
+	{
+		// プレイヤーに向く
+		transform.rotation = Quaternion.Lerp(
+			transform.rotation,
+			Quaternion.LookRotation(m_player.position - transform.position), 0.2f);
+
 		m_idleTime -= Time.deltaTime;
 
 		if (m_idleTime <= 0)
 		{
 
-			switch(m_bossAttackPattern)
+			switch (m_bossAttackPattern)
 			{
 				case 0:
-				{
-					OnMagicAttackTime();
-					break;
-				}
+					{
+						OnMagicAttackTime();
+						break;
+					}
 				case 1:
-				{
-					SkeltonSpawn();
-					break;
-				}
+					{
+						SkeltonSpawnAnimation();
+						break;
+					}
+				case 2:
+					{
+						CurseAttackAnimation();
+						break;
+					}
 			}
-			Debug.Log("a");
-			
 		}
-
 
 		if (m_magicAttack)
 		{
@@ -81,10 +97,10 @@ public class BossMove : MonoBehaviour
 	{
 		m_magicAttackTime -= Time.deltaTime;
 
-		if(m_magicAttackTime <= 0)
+		if (m_magicAttackTime <= 0)
 		{
 			m_animator.SetTrigger("MagicAttack");
-			
+
 			m_magicAttackTime = MaxMagicAttackTime;
 		}
 	}
@@ -127,13 +143,6 @@ public class BossMove : MonoBehaviour
 				StartCoroutine(MagicAttackBomb());
 			}
 		}
-
-		if(m_magicNumber >= MaxMagicNumber && m_magicNumberBomb >= MaxMagicNumber) // マジック攻撃が終わったら
-		{
-			
-			
-			
-		}
 	}
 	private IEnumerator MagicAttackBomb()
 	{
@@ -143,19 +152,48 @@ public class BossMove : MonoBehaviour
 		m_magicNumberBomb++;
 	}
 
-	private void SkeltonSpawn()
+	private void SkeltonSpawnAnimation() // スケルトンスポーンのアニメーション
 	{
 		m_animator.SetTrigger("SkeltonSpawn");
-	}
-
-	public void SummonMob()
-	{
-		for(int i = 0; i < m_pos.Length; i++)
-		{
-			Instantiate(m_skelton,m_pos[i].transform.position, Quaternion.identity);
-		}
-		SoundEffect.Play2D(m_clip[3]);
 		m_bossAttackPattern++;
 		m_idleTime = 10f;
+	}
+
+	public void SummonMob() //骸骨スポーン
+	{
+		for (int i = 0; i < m_skeltonpos.Length; i++)
+		{
+			Instantiate(m_skelton, m_skeltonpos[i].transform.position, Quaternion.identity);
+		}
+		SoundEffect.Play2D(m_clip[3]);
+	}
+
+
+	private void CurseAttackAnimation() // 呪いの攻撃アニメーション
+	{
+		m_animator.SetTrigger("Curse");
+		m_bossAttackPattern++;
+	}
+
+	public void CurseAttack() // 呪いの攻撃
+	{
+		for (int i = 0; i < m_cursePos.Length; i++)
+		{
+			Instantiate(m_curseEffect, m_cursePos[i].transform.position, Quaternion.identity);
+		}
+		SoundEffect.Play2D(m_clip[4]);
+		StartCoroutine(Curse());
+		m_idleTime = 10f;
+	}
+
+	private IEnumerator Curse()
+	{
+		yield return new WaitForSeconds(4);
+
+		for(int i = 0; i < m_skeltonHead.Length; i++)
+		{
+			m_skeltonHead[i].SetActive(true);
+		}
+		SoundEffect.Play2D(m_clip[5]);
 	}
 }
