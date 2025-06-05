@@ -7,6 +7,8 @@ public class SkeletonMove : MonoBehaviour
 {
 	[SerializeField] GameObject m_boss;
 	[SerializeField] GameObject m_player;
+	[SerializeField] GameObject m_effect;
+	[SerializeField] Transform m_skeleton;
 	[SerializeField] AudioClip[] m_skeletonCilps;
 	 
 	private float m_skeltonDeathTime; // ä[çúÇ™éÄÇ Ç‹Ç≈ÇÃéûä‘
@@ -42,6 +44,16 @@ public class SkeletonMove : MonoBehaviour
 		else
 		{
 			m_agent.destination = m_player.transform.position;
+		}
+	}
+
+	private void OnCollisionEnter(Collision other)
+	{
+		if (other.gameObject.CompareTag("Player"))
+		{
+			SoundEffect.Play2D(m_skeletonCilps[1]);
+			Instantiate(m_effect, m_skeleton.transform.position + Vector3.up, Quaternion.identity);
+			Destroy(this.gameObject);
 		}
 	}
 }
