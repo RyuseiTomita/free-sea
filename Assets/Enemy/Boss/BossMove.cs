@@ -156,7 +156,7 @@ public class BossMove : MonoBehaviour
 
 	private IEnumerator MagicAttackBomb()
 	{
-		yield return new WaitForSeconds(3);
+		yield return new WaitForSeconds(2);
 		Instantiate(m_effect[1], m_magicAttackEffect[m_magicNumberBomb].transform.position, Quaternion.Euler(-90, 0, 0));
 		SoundEffect.Play2D(m_clip[2]);
 		m_magicNumberBomb++;
