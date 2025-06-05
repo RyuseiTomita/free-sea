@@ -143,13 +143,8 @@ public class BossMove : MonoBehaviour
 				StartCoroutine(MagicAttackBomb());
 			}
 		}
-
-		Debug.Log(m_magicNumber);
-		if(m_magicNumber >= MaxMagicNumber)
-		{
-			Destroy(this.m_effect[0], 3.0f);
-		}
 	}
+
 	private IEnumerator MagicAttackBomb()
 	{
 		yield return new WaitForSeconds(3);
