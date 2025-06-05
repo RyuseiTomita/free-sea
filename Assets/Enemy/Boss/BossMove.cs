@@ -6,7 +6,9 @@ using UnityEngine.InputSystem.iOS;
 
 public class BossMove : MonoBehaviour
 {
-	[SerializeField] Transform m_player; // プレイヤーに追従
+	[SerializeField] GameObject[] m_model;
+	[SerializeField] Transform m_lookPlayer; // プレイヤーに追従
+	[SerializeField] GameObject m_player;
 	[SerializeField] GameObject[] m_effect;
 	[SerializeField] AudioClip[] m_clip;
 
@@ -43,12 +45,13 @@ public class BossMove : MonoBehaviour
 
 	void Start()
 	{
+		m_animator = m_model[0].GetComponent<Animator>();
 		m_magicNumber = 0;
 		m_magicNumberBomb = 0;
 
 		m_magicCoolDown = 0;
 
-		m_animator = GetComponent<Animator>();
+	
 		m_magicAttack = false;
 		//m_skeltonSpawn = false;
 		//m_isMove = false;
@@ -60,13 +63,12 @@ public class BossMove : MonoBehaviour
 		// プレイヤーに向く
 		transform.rotation = Quaternion.Lerp(
 			transform.rotation,
-			Quaternion.LookRotation(m_player.position - transform.position), 0.2f);
+			Quaternion.LookRotation(m_lookPlayer.position - transform.position), 0.2f);
 
 		m_idleTime -= Time.deltaTime;
 
 		if (m_idleTime <= 0)
 		{
-
 			switch (m_bossAttackPattern)
 			{
 				case 0:
@@ -127,8 +129,6 @@ public class BossMove : MonoBehaviour
 		}
 		else
 		{
-			Debug.Log("B");
-
 			m_magicCoolDown -= Time.deltaTime;
 
 			if (m_magicCoolDown <= 0)
@@ -143,6 +143,12 @@ public class BossMove : MonoBehaviour
 				StartCoroutine(MagicAttackBomb());
 			}
 		}
+
+		Debug.Log(m_magicNumber);
+		if(m_magicNumber >= MaxMagicNumber)
+		{
+			Destroy(this.m_effect[0], 3.0f);
+		}
 	}
 	private IEnumerator MagicAttackBomb()
 	{
@@ -156,13 +162,14 @@ public class BossMove : MonoBehaviour
 	{
 		m_animator.SetTrigger("SkeltonSpawn");
 		m_bossAttackPattern++;
-		m_idleTime = 10f;
+		m_idleTime = 5f;
 	}
 
 	public void SummonMob() //骸骨スポーン
 	{
 		for (int i = 0; i < m_skeltonpos.Length; i++)
 		{
+			m_skelton.GetComponent<SkeletonMove>().SetPlayer(m_player);
 			Instantiate(m_skelton, m_skeltonpos[i].transform.position, Quaternion.identity);
 		}
 		SoundEffect.Play2D(m_clip[3]);
@@ -188,7 +195,7 @@ public class BossMove : MonoBehaviour
 
 	private IEnumerator Curse()
 	{
-		yield return new WaitForSeconds(4);
+		yield return new WaitForSeconds(3);
 
 		for(int i = 0; i < m_skeltonHead.Length; i++)
 		{

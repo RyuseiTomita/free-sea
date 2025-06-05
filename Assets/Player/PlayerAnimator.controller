@@ -345,18 +345,18 @@ AnimatorStateMachine:
     m_Position: {x: 890, y: 380, z: 0}
   - serializedVersion: 1
     m_StateMachine: {fileID: -910257084956025130}
-    m_Position: {x: 640, y: 440, z: 0}
+    m_Position: {x: 700, y: 480, z: 0}
   m_AnyStateTransitions: []
   m_EntryTransitions: []
   m_StateMachineTransitions:
-  - first: {fileID: -910257084956025130}
-    second:
-    - {fileID: -2223711818244503264}
-    - {fileID: 5288762084769320104}
   - first: {fileID: -6490183185508983412}
     second:
     - {fileID: -1864412386088359348}
     - {fileID: -5694061579806758200}
+  - first: {fileID: -910257084956025130}
+    second:
+    - {fileID: -2223711818244503264}
+    - {fileID: 5288762084769320104}
   m_StateMachineBehaviours: []
   m_AnyStatePosition: {x: 500, y: 120, z: 0}
   m_EntryPosition: {x: 50, y: 120, z: 0}
@@ -488,31 +488,31 @@ AnimatorController:
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: Attack
     m_Type: 9
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: Idle
     m_Type: 9
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: ChargeSkill
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: SkillSword
     m_Type: 9
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   m_AnimatorLayers:
   - serializedVersion: 5
     m_Name: Base Layer
@@ -543,7 +543,7 @@ AnimatorState:
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
   m_Mirror: 0
-  m_SpeedParameterActive: 1
+  m_SpeedParameterActive: 0
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
