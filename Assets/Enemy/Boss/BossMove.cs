@@ -1,6 +1,10 @@
 using System;
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.AI;
+using UnityEngine.Rendering;
+using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
 
 public class BossMove : MonoBehaviour
 {
@@ -40,30 +44,33 @@ public class BossMove : MonoBehaviour
 	//private GameObject m_curse;
 
 	[SerializeField] float m_idleTime; // 何もしない時間
+	private float m_speed = 2;
+	private bool m_onMove; // 敵が動いているか
+	private bool m_onAttack = false;
 
-	private int m_bossAttackPattern = 0; // 攻撃パターン
-	private const float MagicAttackTime = 10f;
-	private const float SkeletonTime = 12f;
-	private const float CurseTime = 5f;
-
-	//private bool m_isMove; // 敵が動いているか
-
+	[SerializeField] int m_bossAttackPattern = 0; // 攻撃パターン
+	private const float MagicAttackTime = 3f;
+	private const float SkeletonTime = 5f;
+	private const float CurseTime = 3f;
 
 	private Animator m_animator;
+	//private NavMeshAgent m_agent;
 
 	void Start()
 	{
+		m_onMove = true;
+
 		m_curseDrawTime = 15f;
 		m_curseDrawFlg = false;
 
-		m_idleTime = MagicAttackTime;
+		m_idleTime = 5f;
 
 		m_animator = m_model[0].GetComponent<Animator>();
+		//m_agent = GetComponent<NavMeshAgent>();
 		m_magicNumber = 0;
 		m_magicNumberBomb = 0;
 
 		m_magicCoolDown = 0;
-
 	
 		m_magicAttack = false;
 		//m_skeltonSpawn = false;
@@ -73,30 +80,28 @@ public class BossMove : MonoBehaviour
 
 	void FixedUpdate()
 	{
-		// プレイヤーに向く
-		transform.rotation = Quaternion.Lerp(
-			transform.rotation,
-			Quaternion.LookRotation(m_lookPlayer.position - transform.position), 0.2f);
-
-		m_idleTime -= Time.deltaTime;
-
 		if (m_idleTime <= 0)
 		{
+			m_onMove = false;
+
 			switch (m_bossAttackPattern)
 			{
 				case 0:
 					{
 						OnMagicAttackTime();
+						m_onAttack = true;
 						break;
 					}
 				case 1:
 					{
 						SkeltonSpawnAnimation();
+						m_onAttack = true;
 						break;
 					}
 				case 2:
 					{
 						CurseAttackAnimation();
+						m_onAttack = true;
 						break;
 					}
 			}
@@ -113,12 +118,34 @@ public class BossMove : MonoBehaviour
 
 			CurseDrawTime(m_curseDrawTime);
 		}
+
+		if (!m_onAttack)
+		{
+			m_idleTime -= Time.deltaTime;
+		}
+
+		if (!m_onMove) return;
+
+		transform.rotation = Quaternion.Lerp(
+		   transform.rotation,
+		   Quaternion.LookRotation(m_lookPlayer.position - transform.position),
+		   0.2f);
+
+		// プレイヤーに向けて移動
+		bool isMove = false;
+		if ((m_lookPlayer.position - transform.position).magnitude > 3)
+		{
+			transform.position += transform.forward * m_speed * Time.deltaTime;
+			isMove = true;
+		}
+
+		m_animator.SetBool("Walk", isMove);
 	}
 
 	private void OnMagicAttackTime()
 	{
-		m_animator.SetTrigger("MagicAttack");
 		m_idleTime = SkeletonTime;
+		m_animator.SetTrigger("MagicAttack");
 	}
 
 	public void OnMagicAttackAnimation()
@@ -133,12 +160,15 @@ public class BossMove : MonoBehaviour
 
 	private void OnMagicAttack()
 	{
+		m_onMove = true;
+
 		if (m_magicNumber >= MaxMagicNumber && m_magicAttack) // マジック攻撃が終わったら
 		{
 			m_magicNumber = 0;
 			m_magicAttack = false;
 			m_bossAttackPattern++;
 			m_magicCoolDown = 0f;
+			m_onAttack = false;
 		}
 		else
 		{
@@ -173,18 +203,24 @@ public class BossMove : MonoBehaviour
 			Instantiate(m_effect[2], m_skeltonpos[i].transform.position, Quaternion.identity);
 		}
 		SoundEffect.Play2D(m_clip[6]);
-		m_bossAttackPattern++;
+
 		m_idleTime = CurseTime;
+		
 	}
 
 	public void SummonMob() //骸骨スポーン
 	{
+		m_onMove = true;
+		m_onAttack = false;
+
 		for (int i = 0; i < m_skeltonpos.Length; i++)
 		{
 			m_skelton.GetComponent<SkeletonMove>().SetPlayer(m_player);
 			Instantiate(m_skelton, m_skeltonpos[i].transform.position, Quaternion.identity);
 		}
 		SoundEffect.Play2D(m_clip[3]);
+
+		m_bossAttackPattern++;
 	}
 
 
@@ -192,10 +228,14 @@ public class BossMove : MonoBehaviour
 	{
 		m_animator.SetTrigger("Curse");
 		m_bossAttackPattern++;
+		m_idleTime = MagicAttackTime;
+
+		Debug.Log(m_onAttack);
 	}
 
 	public void CurseAttack() // 呪いの攻撃
 	{
+		m_onMove = true;
 		m_curse = UnityEngine.Random.Range(0, 2);
 		Debug.Log(m_curse);
 
@@ -218,10 +258,9 @@ public class BossMove : MonoBehaviour
 				break;
 			}
 		}
-
+		m_onAttack = false;
 		SoundEffect.Play2D(m_clip[4]);
 		StartCoroutine(Curse());
-		m_idleTime = 10f;
 	}
 
 	private IEnumerator Curse()
@@ -237,6 +276,7 @@ public class BossMove : MonoBehaviour
 					for (int i = 0; i < m_cursePos.Length; i++)
 					{
 						Instantiate(m_skeltonHead, m_cursePos[i].transform.position, Quaternion.identity);
+						m_skeltonHead.GetComponent<CurseSkeletonHead>().SetPlayer(m_lookPlayer);
 					}
 					break;
 				}
@@ -245,6 +285,7 @@ public class BossMove : MonoBehaviour
 					for (int i = 0; i < m_cursePos.Length; i++)
 					{
 						Instantiate(m_skeltonHead, m_cursePos2[i].transform.position, Quaternion.identity);
+						m_skeltonHead.GetComponent<CurseSkeletonHead>().SetPlayer(m_lookPlayer);
 					}
 					break;
 				}
@@ -257,8 +298,32 @@ public class BossMove : MonoBehaviour
 	{
 		curse = m_curseDrawTime;
 
+		Debug.Log(curse);
+
 		if (curse <= 0)
 		{
+			switch (m_curse)
+			{
+				case 0:
+					{
+						for (int i = 0; i < m_cursePos.Length; i++)
+						{
+							Instantiate(m_effect[3], m_cursePos[i].transform.position, Quaternion.Euler(-90, 0, 0));
+						}
+						break;
+					}
+				case 1:
+					{
+						for (int i = 0; i < m_cursePos.Length; i++)
+						{
+							Instantiate(m_effect[3], m_cursePos2[i].transform.position, Quaternion.Euler(-90, 0, 0));
+						}
+						break;
+					}
+			}
+
+
+
 			SoundEffect.Play2D(m_clip[7]);
 
 			m_curseDrawTime = MaxCurseTime;
