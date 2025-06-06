@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ac3c9457e1be324eaea3ca63ca7ff2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_time: 5
+  m_time: 8
 --- !u!1001 &6872933475672245831
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -58,6 +58,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 274800222813354487, guid: e52bab2845404f845a61def810fcc705,
+        type: 3}
+      propertyPath: InitialModule.startLifetime.scalar
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 280014332511540107, guid: e52bab2845404f845a61def810fcc705,
+        type: 3}
+      propertyPath: InitialModule.startLifetime.scalar
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1336510160583922030, guid: e52bab2845404f845a61def810fcc705,
+        type: 3}
+      propertyPath: InitialModule.startLifetime.scalar
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1602394655745013977, guid: e52bab2845404f845a61def810fcc705,
+        type: 3}
+      propertyPath: InitialModule.startLifetime.scalar
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2014128913095585371, guid: e52bab2845404f845a61def810fcc705,
         type: 3}
@@ -78,6 +98,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 5936817956851514767, guid: e52bab2845404f845a61def810fcc705,
+        type: 3}
+      propertyPath: InitialModule.startLifetime.scalar
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7898914686281044152, guid: e52bab2845404f845a61def810fcc705,
         type: 3}
