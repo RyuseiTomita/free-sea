@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1353096078718859478}
+  - component: {fileID: -8254366015606726765}
   m_Layer: 0
   m_Name: CurseAttack
   m_TagString: Untagged
@@ -32,6 +33,19 @@ Transform:
   - {fileID: 6018036415616041768}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-8254366015606726765
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2004205606245757472}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ac3c9457e1be324eaea3ca63ca7ff2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_time: 15
 --- !u!1001 &6563167316108088657
 PrefabInstance:
   m_ObjectHideFlags: 0

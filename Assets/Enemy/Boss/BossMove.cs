@@ -27,13 +27,17 @@ public class BossMove : MonoBehaviour
 	[SerializeField] Transform[] m_skeltonpos;   // Š[œ‚Ìƒ|ƒWƒVƒ‡ƒ“
 	//private bool m_skeltonSpawn;
 
-	// ô‚¢‚ÌUŒ‚
-	[SerializeField] GameObject[] m_skeltonHead; // Š[œ‚Ì“ª
-	[SerializeField] GameObject m_curseEffect;
+	// ô‚¢‚ÌUŒ‚(2ƒpƒ^[ƒ“)
+	[SerializeField] GameObject m_skeltonHead; // Š[œ‚Ì“ª
 	[SerializeField] Transform[] m_cursePos;
+	[SerializeField] Transform[] m_cursePos2;
+	private static int m_curse;
+
+	[SerializeField] GameObject m_curseEffect;
 	private float m_curseDrawTime;
 	private const float MaxCurseTime = 15f; 
 	private bool m_curseDrawFlg;
+	//private GameObject m_curse;
 
 	[SerializeField] float m_idleTime; // ‰½‚à‚µ‚È‚¢ŠÔ
 
@@ -142,7 +146,6 @@ public class BossMove : MonoBehaviour
 
 			if (m_magicCoolDown <= 0)
 			{
-				Debug.Log("a");
 				if (m_magicNumber == 0) { m_magicNumberBomb = 0; }
 				GameObject m_effectBomb = Instantiate(m_effect[0], m_player.transform.position, Quaternion.identity);
 				m_magicAttackEffect[m_magicNumber] = m_effectBomb;
@@ -193,10 +196,29 @@ public class BossMove : MonoBehaviour
 
 	public void CurseAttack() // ô‚¢‚ÌUŒ‚
 	{
-		for (int i = 0; i < m_cursePos.Length; i++)
+		m_curse = UnityEngine.Random.Range(0, 2);
+		Debug.Log(m_curse);
+
+		switch (m_curse)
 		{
-			Instantiate(m_curseEffect, m_cursePos[i].transform.position, Quaternion.identity);
+			case 0:
+			{
+				for (int i = 0; i < m_cursePos.Length; i++)
+				{
+					Instantiate(m_curseEffect, m_cursePos[i].transform.position, Quaternion.identity);
+				}
+				break;
+			}	
+			case 1:
+			{
+				for (int i = 0; i < m_cursePos2.Length; i++)
+				{
+					Instantiate(m_curseEffect, m_cursePos2[i].transform.position, Quaternion.identity);
+				}
+				break;
+			}
 		}
+
 		SoundEffect.Play2D(m_clip[4]);
 		StartCoroutine(Curse());
 		m_idleTime = 10f;
@@ -208,9 +230,24 @@ public class BossMove : MonoBehaviour
 
 		m_curseDrawFlg = true;
 
-		for (int i = 0; i < m_skeltonHead.Length; i++)
+		switch (m_curse)
 		{
-			m_skeltonHead[i].SetActive(true);
+			case 0:
+				{
+					for (int i = 0; i < m_cursePos.Length; i++)
+					{
+						Instantiate(m_skeltonHead, m_cursePos[i].transform.position, Quaternion.identity);
+					}
+					break;
+				}
+			case 1:
+				{
+					for (int i = 0; i < m_cursePos.Length; i++)
+					{
+						Instantiate(m_skeltonHead, m_cursePos2[i].transform.position, Quaternion.identity);
+					}
+					break;
+				}
 		}
 		SoundEffect.Play2D(m_clip[5]);
 		m_bossAttackPattern = 0;
@@ -218,18 +255,10 @@ public class BossMove : MonoBehaviour
 
 	private void CurseDrawTime(float curse)
 	{
-		
-
 		curse = m_curseDrawTime;
 
-		if(curse <= 0)
+		if (curse <= 0)
 		{
-			for(int i = 0; i <m_skeltonHead.Length; i++)
-			{
-				m_skeltonHead[i].SetActive(false);
-			}
-
-
 			SoundEffect.Play2D(m_clip[7]);
 
 			m_curseDrawTime = MaxCurseTime;
