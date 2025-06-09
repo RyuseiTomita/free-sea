@@ -8,9 +8,9 @@ using UnityEngine.InputSystem;
 public class PlayerMove : MonoBehaviour
 {
 	[Header("ˆÚ“®‚Ì‘¬‚³"), SerializeField]
-	private float m_speed = 6.0f;
+	private float m_speed;
 
-	[SerializeField] const float NormalSpeed = 6;
+	[SerializeField] const float NormalSpeed = 5;
 
 	[Header("ƒWƒƒƒ“ƒv‚·‚éuŠÔ‚Ì‘¬‚³"), SerializeField]
 	private float m_jumpSpeed = 30.0f;
@@ -209,7 +209,6 @@ public class PlayerMove : MonoBehaviour
 
 	private void NormalTime()
 	{
-		
 		m_speed = NormalSpeed;
 		m_sword[0].SetActive(true);
 		m_sword[1].SetActive(false);

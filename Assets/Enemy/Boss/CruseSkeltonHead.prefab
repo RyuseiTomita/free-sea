@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5877347845483207280}
   - component: {fileID: 5769748560650866558}
+  - component: {fileID: 598485364554264182}
   m_Layer: 0
   m_Name: CruseSkeltonHead
   m_TagString: Untagged
@@ -46,6 +47,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_player: {fileID: 0}
+--- !u!114 &598485364554264182
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9044602874992507963}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ac3c9457e1be324eaea3ca63ca7ff2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_time: 15
 --- !u!1001 &5725976049315089933
 PrefabInstance:
   m_ObjectHideFlags: 0

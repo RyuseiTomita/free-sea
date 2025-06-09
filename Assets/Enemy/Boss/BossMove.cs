@@ -2,9 +2,6 @@ using System;
 using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.AI;
-using UnityEngine.Rendering;
-using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
 
 public class BossMove : MonoBehaviour
 {
@@ -229,15 +226,12 @@ public class BossMove : MonoBehaviour
 		m_animator.SetTrigger("Curse");
 		m_bossAttackPattern++;
 		m_idleTime = MagicAttackTime;
-
-		Debug.Log(m_onAttack);
 	}
 
 	public void CurseAttack() // éÙÇ¢ÇÃçUåÇ
 	{
 		m_onMove = true;
 		m_curse = UnityEngine.Random.Range(0, 2);
-		Debug.Log(m_curse);
 
 		switch (m_curse)
 		{
@@ -275,8 +269,8 @@ public class BossMove : MonoBehaviour
 				{
 					for (int i = 0; i < m_cursePos.Length; i++)
 					{
-						Instantiate(m_skeltonHead, m_cursePos[i].transform.position, Quaternion.identity);
 						m_skeltonHead.GetComponent<CurseSkeletonHead>().SetPlayer(m_lookPlayer);
+						Instantiate(m_skeltonHead, m_cursePos[i].transform.position, Quaternion.identity);
 					}
 					break;
 				}
@@ -284,8 +278,8 @@ public class BossMove : MonoBehaviour
 				{
 					for (int i = 0; i < m_cursePos.Length; i++)
 					{
-						Instantiate(m_skeltonHead, m_cursePos2[i].transform.position, Quaternion.identity);
 						m_skeltonHead.GetComponent<CurseSkeletonHead>().SetPlayer(m_lookPlayer);
+						Instantiate(m_skeltonHead, m_cursePos2[i].transform.position, Quaternion.identity);
 					}
 					break;
 				}
@@ -297,8 +291,6 @@ public class BossMove : MonoBehaviour
 	private void CurseDrawTime(float curse)
 	{
 		curse = m_curseDrawTime;
-
-		Debug.Log(curse);
 
 		if (curse <= 0)
 		{
