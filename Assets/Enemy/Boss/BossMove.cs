@@ -63,6 +63,7 @@ public class BossMove : MonoBehaviour
 
 	// 覚醒モード
 	[SerializeField] GameObject[] m_grave; // 墓の数
+	private int m_graveCount;
 
 	// BossのHp
 	[SerializeField] int m_bossHealth = 200;
@@ -95,6 +96,8 @@ public class BossMove : MonoBehaviour
 		m_isDeath = false;
 		//m_skeltonSpawn = false;
 		//m_isMove = false;
+
+		m_graveCount = 0;
 	}
 
 
@@ -394,5 +397,17 @@ public class BossMove : MonoBehaviour
 	{
 		m_canShield = false;
 		m_onMove = true;
+	}
+
+	// バリアを壊す
+	public void ShieldBreak()
+	{
+		m_graveCount++;
+		if (m_graveCount >= 4)
+		{
+			SoundEffect.Play2D(m_clip[10]);
+			m_collider.enabled = true;
+			m_shield.SetActive(false);
+		}
 	}
 }
