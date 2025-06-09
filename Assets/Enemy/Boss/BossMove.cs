@@ -41,7 +41,7 @@ public class BossMove : MonoBehaviour
 	[SerializeField] Collider m_collider;
 	private bool m_isShield;
 	private bool m_canShield;
-	private float m_shieldTime;
+	//private float m_shieldTime;
  
 	[SerializeField] GameObject m_curseEffect;
 	private float m_curseDrawTime;
@@ -77,7 +77,7 @@ public class BossMove : MonoBehaviour
 	{
 		m_onMove = true;
 
-		m_shieldTime = 5f;
+		//m_shieldTime = 5f;
 		m_curseDrawTime = 15f;
 		m_curseDrawFlg = false;
 

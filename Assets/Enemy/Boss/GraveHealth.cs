@@ -10,14 +10,11 @@ public class GraveHealth : MonoBehaviour
 	[SerializeField] GameObject m_boss;
 	[SerializeField] AudioClip m_clips;
 	[SerializeField] GameObject m_graveobj;
-	private int m_grave;
-	private bool m_graveBreak;
-
+	
 	// Start is called before the first frame update
 	void Start()
     {
-		m_grave = 1;
-		m_graveBreak = false;
+
 	}
 
     // Update is called once per frame

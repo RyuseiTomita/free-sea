@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-	private bool m_bgmSecond;
+	//private bool m_bgmSecond;
 	[SerializeField] AudioClip[] m_audioClip;
 	[SerializeField] AudioSource m_audioSource;
  
@@ -12,7 +12,7 @@ public class GameManager : MonoBehaviour
     {
 		m_audioSource = GetComponent<AudioSource>();
 		m_audioSource.clip = m_audioClip[0];
-		m_bgmSecond = false;
+		//m_bgmSecond = false;
 	}
 
     void Update()

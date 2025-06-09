@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
+//using UnityEngine.UIElements;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerMove : MonoBehaviour
@@ -39,6 +41,11 @@ public class PlayerMove : MonoBehaviour
 	[SerializeField] GameObject[] m_sword;
 	[SerializeField] GameObject m_skillImage;
 	[SerializeField] GameObject m_skillUi;
+
+	[SerializeField] Slider m_slider;
+	[SerializeField] int m_playerHeath;
+
+
 
 	private Animator m_animator;
 	private AudioSource audioSource;
@@ -219,7 +226,9 @@ public class PlayerMove : MonoBehaviour
 
 	private void FixedUpdate()
     {
-		if(m_chargeAttack && !m_awakening) // チャージ中かつまだ発動していないとき
+		m_slider.value = m_playerHeath;
+
+		if (m_chargeAttack && !m_awakening) // チャージ中かつまだ発動していないとき
 		{
 			m_chargeSkill -= Time.deltaTime;
 
