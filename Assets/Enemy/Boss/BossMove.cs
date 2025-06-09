@@ -2,10 +2,12 @@ using System;
 using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BossMove : MonoBehaviour
 {
 	[SerializeField] GameObject[] m_model;
+	[SerializeField] Slider slider; // HP
 	[SerializeField] Transform m_lookPlayer; // プレイヤーに追従
 	[SerializeField] GameObject m_player;
 	[SerializeField] GameObject[] m_effect;
@@ -34,6 +36,10 @@ public class BossMove : MonoBehaviour
 	[SerializeField] Transform[] m_cursePos2;
 	private static int m_curse;
 
+	// シールド
+	[SerializeField] GameObject m_shield;
+	private bool m_canShield;
+ 
 	[SerializeField] GameObject m_curseEffect;
 	private float m_curseDrawTime;
 	private const float MaxCurseTime = 15f; 
@@ -50,8 +56,11 @@ public class BossMove : MonoBehaviour
 	private const float SkeletonTime = 5f;
 	private const float CurseTime = 3f;
 
+	// BossのHp
+	[SerializeField] int m_bossHealth = 100;
+	private bool m_isDeath;
+
 	private Animator m_animator;
-	//private NavMeshAgent m_agent;
 
 	void Start()
 	{
@@ -70,6 +79,9 @@ public class BossMove : MonoBehaviour
 		m_magicCoolDown = 0;
 	
 		m_magicAttack = false;
+		m_canShield = false;
+
+		m_isDeath = false;
 		//m_skeltonSpawn = false;
 		//m_isMove = false;
 	}
@@ -77,6 +89,10 @@ public class BossMove : MonoBehaviour
 
 	void FixedUpdate()
 	{
+		slider.value = m_bossHealth;
+
+		if (m_isDeath) return;
+
 		if (m_idleTime <= 0)
 		{
 			m_onMove = false;
@@ -138,6 +154,18 @@ public class BossMove : MonoBehaviour
 
 		m_animator.SetBool("Walk", isMove);
 	}
+
+	public void HitAttack(int hit)
+	{
+		m_bossHealth -= hit;
+
+		if(m_bossHealth <= 0)
+		{
+			m_isDeath = true;
+			m_animator.SetTrigger("Death");
+		}
+	}
+
 
 	private void OnMagicAttackTime()
 	{
@@ -322,5 +350,11 @@ public class BossMove : MonoBehaviour
 
 			m_curseDrawFlg = false;
 		}
+	}
+
+	private void ShieldAnimation()
+	{
+		m_shield.SetActive(true);
+		m_canShield = false;
 	}
 }
