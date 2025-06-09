@@ -30,7 +30,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4646581664032990616}
-  - {fileID: 9041486781660988862}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &3127439696932714211
@@ -39,7 +38,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 4929282835594063569}
+    m_TransformParent: {fileID: 4646581664032990616}
     m_Modifications:
     - target: {fileID: 136190154076312338, guid: 5156d6689efbccb4991059f3a5755566,
         type: 3}
@@ -69,17 +68,17 @@ PrefabInstance:
     - target: {fileID: 6205737666926490461, guid: 5156d6689efbccb4991059f3a5755566,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 1.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6205737666926490461, guid: 5156d6689efbccb4991059f3a5755566,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 1.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6205737666926490461, guid: 5156d6689efbccb4991059f3a5755566,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 1.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6205737666926490461, guid: 5156d6689efbccb4991059f3a5755566,
         type: 3}
@@ -267,7 +266,11 @@ PrefabInstance:
       objectReference: {fileID: 9100000, guid: 8b947aa3b2613274d9d80bb5e80c09dd, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 3018544719663928713, guid: 9257ae217dd1b404c845ae1f178cbfd8,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9041486781660988862}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 2499452444250165043, guid: 9257ae217dd1b404c845ae1f178cbfd8,
         type: 3}
@@ -299,6 +302,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_model: []
+  slider: {fileID: 0}
   m_lookPlayer: {fileID: 0}
   m_player: {fileID: 0}
   m_effect:
@@ -314,6 +318,9 @@ MonoBehaviour:
   m_skeltonHead: {fileID: 0}
   m_cursePos: []
   m_cursePos2: []
+  m_shield: {fileID: 0}
   m_curseEffect: {fileID: 0}
   m_idleTime: 5
   m_bossAttackPattern: 0
+  m_grave: []
+  m_bossHealth: 200

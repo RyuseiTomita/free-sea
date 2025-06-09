@@ -38,7 +38,10 @@ public class BossMove : MonoBehaviour
 
 	// シールド
 	[SerializeField] GameObject m_shield;
+	[SerializeField] Collider m_collider;
+	private bool m_isShield;
 	private bool m_canShield;
+	private float m_shieldTime;
  
 	[SerializeField] GameObject m_curseEffect;
 	private float m_curseDrawTime;
@@ -51,14 +54,21 @@ public class BossMove : MonoBehaviour
 	private bool m_onMove; // 敵が動いているか
 	private bool m_onAttack = false;
 
-	[SerializeField] int m_bossAttackPattern = 0; // 攻撃パターン
+
+	// 攻撃パターン
+	[SerializeField] int m_bossAttackPattern = 0; 
 	private const float MagicAttackTime = 3f;
 	private const float SkeletonTime = 5f;
 	private const float CurseTime = 3f;
 
+	// 覚醒モード
+	[SerializeField] GameObject[] m_grave; // 墓の数
+
 	// BossのHp
-	[SerializeField] int m_bossHealth = 100;
+	[SerializeField] int m_bossHealth = 200;
 	private bool m_isDeath;
+
+	[SerializeField] GameObject gameManager;
 
 	private Animator m_animator;
 
@@ -66,19 +76,20 @@ public class BossMove : MonoBehaviour
 	{
 		m_onMove = true;
 
+		m_shieldTime = 5f;
 		m_curseDrawTime = 15f;
 		m_curseDrawFlg = false;
 
 		m_idleTime = 5f;
 
 		m_animator = m_model[0].GetComponent<Animator>();
-		//m_agent = GetComponent<NavMeshAgent>();
 		m_magicNumber = 0;
 		m_magicNumberBomb = 0;
 
 		m_magicCoolDown = 0;
 	
 		m_magicAttack = false;
+		m_isShield = false;
 		m_canShield = false;
 
 		m_isDeath = false;
@@ -91,7 +102,7 @@ public class BossMove : MonoBehaviour
 	{
 		slider.value = m_bossHealth;
 
-		if (m_isDeath) return;
+		if (m_isDeath || m_canShield) return;
 
 		if (m_idleTime <= 0)
 		{
@@ -155,11 +166,20 @@ public class BossMove : MonoBehaviour
 		m_animator.SetBool("Walk", isMove);
 	}
 
+	// プレイヤーからダメージを食らう
 	public void HitAttack(int hit)
 	{
 		m_bossHealth -= hit;
 
-		if(m_bossHealth <= 0)
+		if (m_bossHealth <= 100 && !m_isShield) // HPが半分を切ったら覚醒モード
+		{
+			m_isShield = true;
+			m_canShield = true;
+			m_onMove = false;
+			m_idleTime = 5f;
+			m_animator.SetTrigger("Shield");
+		}
+		else if(m_bossHealth <= 0) // HPがなくなったら死ぬ
 		{
 			m_isDeath = true;
 			m_animator.SetTrigger("Death");
@@ -352,9 +372,27 @@ public class BossMove : MonoBehaviour
 		}
 	}
 
+	public void ShieldSound()
+	{
+		SoundEffect.Play2D(m_clip[8]);
+	}
+
 	private void ShieldAnimation()
 	{
+		for(int i = 0; i < 4; i++)
+		{
+			m_grave[i].SetActive(true);
+		}
+
 		m_shield.SetActive(true);
+		SoundEffect.Play2D(m_clip[9]);
+		m_collider.enabled = false;
+		gameManager.GetComponent<GameManager>().BgmChange();
+	}
+
+	public void ShieldAnimationEnd()
+	{
 		m_canShield = false;
+		m_onMove = true;
 	}
 }
