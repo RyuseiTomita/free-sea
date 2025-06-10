@@ -781,6 +781,8 @@ GameObject:
   - component: {fileID: 8606836575472684017}
   - component: {fileID: 2911459945244213364}
   - component: {fileID: 1347013178523560532}
+  - component: {fileID: 6707818802850158582}
+  - component: {fileID: 3995976764034085763}
   m_Layer: 0
   m_Name: CruseSkeltonHead
   m_TagString: Untagged
@@ -840,6 +842,40 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_time: 15
+--- !u!135 &6707818802850158582
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6897531783260327563}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 3
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &3995976764034085763
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6897531783260327563}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 183dc50b6267443409922e9b98b30d07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_clip: {fileID: 8300000, guid: 5b393b23f5af7b24ab5ef481a94eb44d, type: 3}
 --- !u!1 &8252249598052157362
 GameObject:
   m_ObjectHideFlags: 0

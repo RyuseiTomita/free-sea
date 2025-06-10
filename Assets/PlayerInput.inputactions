@@ -265,7 +265,7 @@
                     "name": "",
                     "id": "0ddcf931-1f3e-4f44-82ac-69f6367aaae9",
                     "path": "<Gamepad>/buttonWest",
-                    "interactions": "Hold",
+                    "interactions": "Hold(duration=1.401298E-45)",
                     "processors": "",
                     "groups": "",
                     "action": "ChargeAttack",

@@ -53,7 +53,7 @@ public class BossMove : MonoBehaviour
 	private float m_speed = 2;
 	private bool m_onMove; // 敵が動いているか
 	private bool m_onAttack = false;
-
+	private bool m_gameSet;
 
 	// 攻撃パターン
 	[SerializeField] int m_bossAttackPattern = 0; 
@@ -94,6 +94,7 @@ public class BossMove : MonoBehaviour
 		m_canShield = false;
 
 		m_isDeath = false;
+		m_gameSet = false;
 		//m_skeltonSpawn = false;
 		//m_isMove = false;
 
@@ -105,7 +106,7 @@ public class BossMove : MonoBehaviour
 	{
 		slider.value = m_bossHealth;
 
-		if (m_isDeath || m_canShield) return;
+		if (m_isDeath || m_canShield || m_gameSet) return;
 
 		if (m_idleTime <= 0)
 		{
@@ -174,7 +175,7 @@ public class BossMove : MonoBehaviour
 	{
 		m_bossHealth -= hit;
 
-		if (m_bossHealth <= 100 && !m_isShield) // HPが半分を切ったら覚醒モード
+		if (m_bossHealth <= 75 && !m_isShield) // HPが半分を切ったら覚醒モード
 		{
 			m_isShield = true;
 			m_canShield = true;
@@ -409,5 +410,11 @@ public class BossMove : MonoBehaviour
 			m_collider.enabled = true;
 			m_shield.SetActive(false);
 		}
+	}
+
+	// ゲームセット(playerが負けたら)
+	public void GameSet()
+	{
+		m_gameSet = true;
 	}
 }

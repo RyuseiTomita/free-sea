@@ -13,6 +13,7 @@ public class PlayerMove : MonoBehaviour
 	private float m_speed;
 
 	[SerializeField] const float NormalSpeed = 5;
+	private const float SpeedUp = 7;
 
 	[Header("ジャンプする瞬間の速さ"), SerializeField]
 	private float m_jumpSpeed = 30.0f;
@@ -43,10 +44,12 @@ public class PlayerMove : MonoBehaviour
 	[SerializeField] GameObject m_skillUi;
 
 	[SerializeField] Slider m_slider;
+	[SerializeField] Collider m_collider;
 	[SerializeField] int m_playerHeath;
+	private bool m_isDeath;
 
-
-
+	[SerializeField] GameObject m_boss;
+ 
 	private Animator m_animator;
 	private AudioSource audioSource;
 	private Transform m_transform;
@@ -60,7 +63,7 @@ public class PlayerMove : MonoBehaviour
 
 	private bool m_canMove; // プレイヤーを動かせれるか
 	private bool m_chargeAttack; // スキルチャージ中
-	private bool m_awakening;	 // スキル発動
+	public bool m_awakening;	 // スキル発動
 
 	private void Awake()
 	{
@@ -77,6 +80,7 @@ public class PlayerMove : MonoBehaviour
 
 		m_chargeAttack = false;
 		m_awakening = false;
+		m_isDeath = false;
 	}
 	private void Start()
 	{
@@ -115,7 +119,7 @@ public class PlayerMove : MonoBehaviour
 
 	public void OnMove(InputAction.CallbackContext context)
 	{
-		if (!m_canMove) return;
+		if (!m_canMove || m_isDeath) return;
 
 		// 入力値に保持しておく
 		m_inputMove = context.ReadValue<Vector2>();
@@ -156,7 +160,7 @@ public class PlayerMove : MonoBehaviour
 	public void OnChargeAttack(InputAction.CallbackContext context)
 	{
 		// スキルチャージ中または動いていないとき
-		if (m_awakening || !m_canMove) return;
+		if (m_awakening || !m_canMove || m_isDeath) return;
 
 		m_chargeAttack = true;
 		m_animator.SetBool("ChargeSkill", true);
@@ -197,14 +201,16 @@ public class PlayerMove : MonoBehaviour
 
 	private void SkillActivation() // スキル発動
 	{
+		m_chargeAttack = false;
+		m_animator.SetBool("ChargeSkill",false);
 		m_skillUi.SetActive(false);
 		m_skillImage.GetComponent<SkillTimer>().CoolDown(true);
-		float speedUp = 4f;
+		
 
 		SoundEffect.Play2D(m_clip[3]);
 		
 
-		m_speed += speedUp;
+		m_speed = SpeedUp;
 
 		m_effect[0].SetActive(false);
 		m_effect[1].SetActive(true);
@@ -227,6 +233,8 @@ public class PlayerMove : MonoBehaviour
 	private void FixedUpdate()
     {
 		m_slider.value = m_playerHeath;
+
+		if (m_isDeath) return;
 
 		if (m_chargeAttack && !m_awakening) // チャージ中かつまだ発動していないとき
 		{
@@ -327,11 +335,68 @@ public class PlayerMove : MonoBehaviour
 
 	public void HitMagicAttack(int magicAttack) // MagicAttack
 	{
-		m_playerHeath -= magicAttack;
+		if(m_playerHeath <= 0)
+		{
+			m_collider.enabled = false;
+			m_isDeath = true;
+			m_animator.SetBool("Death", true);
+			m_boss.GetComponent<BossMove>().GameSet();
+		}
+		else
+		{
+			m_playerHeath -= magicAttack;
+		}
 	}
 
 	public void HitSkeletonAttack(int skeletonAttack) // 骸骨
 	{
-		m_playerHeath -= skeletonAttack;
+
+		if (m_playerHeath <= 0)
+		{
+			m_collider.enabled = false;
+			m_isDeath = true; 
+			m_animator.SetBool("Death", true);
+			m_boss.GetComponent<BossMove>().GameSet();
+		}
+		else
+		{
+			if (m_awakening)
+			{
+				m_playerHeath -= 1;
+			}
+			else
+			{
+				m_playerHeath -= skeletonAttack;
+			}
+		}
+	}
+
+	public void HitCruseAttack(float cruseAttack) // 毒エリア
+	{
+		if (m_awakening)
+		{
+			m_speed = NormalSpeed;
+		}
+		else
+		{
+			m_speed = cruseAttack;
+		}
+	}
+
+	public void HitCruseAttackSound()
+	{
+		SoundEffect.Play2D(m_clip[4]);
+	}
+
+	public void HitCruseAttackExit()
+	{
+		if (m_awakening)
+		{
+			m_speed = SpeedUp;
+		}
+		else
+		{
+			m_speed = NormalSpeed;
+		}
 	}
 }
