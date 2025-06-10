@@ -322,4 +322,16 @@ public class PlayerMove : MonoBehaviour
 			m_transform.rotation = Quaternion.Euler(0, angleY, 0);
 		}
 	}
+
+	// 敵からダメージを食らう
+
+	public void HitMagicAttack(int magicAttack) // MagicAttack
+	{
+		m_playerHeath -= magicAttack;
+	}
+
+	public void HitSkeletonAttack(int skeletonAttack) // 骸骨
+	{
+		m_playerHeath -= skeletonAttack;
+	}
 }

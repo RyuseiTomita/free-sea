@@ -13,6 +13,7 @@ public class SkeletonMove : MonoBehaviour
 	[SerializeField] AudioClip[] m_skeletonCilps;
 	 
 	private float m_skeltonDeathTime; // ä[çúÇ™éÄÇ Ç‹Ç≈ÇÃéûä‘
+	private int m_skeletonAttack;
 
 	NavMeshAgent m_agent;
 	
@@ -20,7 +21,7 @@ public class SkeletonMove : MonoBehaviour
     {
 		m_agent = GetComponent<NavMeshAgent>();
 		m_skeltonDeathTime = 10f;
-
+		m_skeletonAttack = 2;
 	}
 
     void Update()
@@ -52,6 +53,7 @@ public class SkeletonMove : MonoBehaviour
 	{
 		if (other.gameObject.CompareTag("Player"))
 		{
+			other.gameObject.GetComponent<PlayerMove>().HitSkeletonAttack(m_skeletonAttack);
 			SoundEffect.Play2D(m_skeletonCilps[1]);
 			Instantiate(m_effect, m_skeleton.transform.position + Vector3.up, Quaternion.identity);
 			Destroy(this.gameObject);
