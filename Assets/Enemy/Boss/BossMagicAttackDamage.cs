@@ -9,7 +9,7 @@ public class BossMagicAttackDamage : MonoBehaviour
 
 	private void Start()
 	{
-		m_damage = 3;
+		m_damage = 5;
 		StartCoroutine(MagicAttackCollider());
 	}
 

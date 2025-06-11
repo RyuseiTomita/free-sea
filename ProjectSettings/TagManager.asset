@@ -7,19 +7,21 @@ TagManager:
   - Boss
   - Shield
   - CruseZone
+  - Ground
+  - Skelton
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Player
   - Water
   - UI
   - Boss
   - Skeleton
-  - 
-  - 
-  - 
-  - 
+  - Grave
+  - BossShield
+  - Sowd
+  - Foundation
   - 
   - 
   - 

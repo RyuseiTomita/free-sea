@@ -22,12 +22,18 @@ public class BossMove : MonoBehaviour
 	// 弾の数
 	[SerializeField] int m_magicNumber; // 魔法陣の順番
 	private int m_magicNumberBomb;      // 爆弾の順番
-	private const int MaxMagicNumber = 6;
+	private int MaxMagicNumber = 6;
 	private GameObject[] m_magicAttackEffect = new GameObject[10];
+
+	// 覚醒中の時の弾の数
 
 	//　骸骨の召喚
 	[SerializeField] GameObject m_skelton;
 	[SerializeField] Transform[] m_skeltonpos;   // 骸骨のポジション
+
+	// 覚醒状態の時のスケルトンPos
+	[SerializeField] GameObject m_awakeningSkelton;
+	[SerializeField] Transform[] m_awakeningSkeltonPos;
 	//private bool m_skeltonSpawn;
 
 	// 呪いの攻撃(2パターン)
@@ -63,6 +69,7 @@ public class BossMove : MonoBehaviour
 
 	// 覚醒モード
 	[SerializeField] GameObject[] m_grave; // 墓の数
+	private bool m_awakeningMode; // 敵が覚醒中か
 	private int m_graveCount;
 
 	// BossのHp
@@ -94,6 +101,7 @@ public class BossMove : MonoBehaviour
 		m_canShield = false;
 
 		m_isDeath = false;
+		m_awakeningMode = false;
 		m_gameSet = false;
 		//m_skeltonSpawn = false;
 		//m_isMove = false;
@@ -111,7 +119,7 @@ public class BossMove : MonoBehaviour
 		if (m_idleTime <= 0)
 		{
 			m_onMove = false;
-
+			
 			switch (m_bossAttackPattern)
 			{
 				case 0:
@@ -187,6 +195,8 @@ public class BossMove : MonoBehaviour
 		{
 			m_isDeath = true;
 			m_animator.SetTrigger("Death");
+			m_effect[4].SetActive(false);
+			m_effect[5].SetActive(false);
 		}
 	}
 
@@ -210,6 +220,11 @@ public class BossMove : MonoBehaviour
 	private void OnMagicAttack()
 	{
 		m_onMove = true;
+
+		if(m_awakeningMode)
+		{
+			MaxMagicNumber = 8;
+		}
 
 		if (m_magicNumber >= MaxMagicNumber && m_magicAttack) // マジック攻撃が終わったら
 		{
@@ -247,11 +262,21 @@ public class BossMove : MonoBehaviour
 	private void SkeltonSpawnAnimation() // スケルトンスポーンのアニメーション
 	{
 		m_animator.SetTrigger("SkeltonSpawn");
-		for (int i = 0; i < m_skeltonpos.Length; i++)
+		if(m_awakeningMode)
 		{
-			Instantiate(m_effect[2], m_skeltonpos[i].transform.position, Quaternion.identity);
+			for (int i = 0; i < m_awakeningSkeltonPos.Length; i++)
+			{
+				Instantiate(m_effect[2], m_awakeningSkeltonPos[i].transform.position, Quaternion.identity);
+			}
 		}
-		SoundEffect.Play2D(m_clip[6]);
+		else
+		{
+			for (int i = 0; i < m_skeltonpos.Length; i++)
+			{
+				Instantiate(m_effect[2], m_skeltonpos[i].transform.position, Quaternion.identity);
+			}
+		}
+			SoundEffect.Play2D(m_clip[6]);
 
 		m_idleTime = CurseTime;
 		
@@ -262,14 +287,32 @@ public class BossMove : MonoBehaviour
 		m_onMove = true;
 		m_onAttack = false;
 
-		for (int i = 0; i < m_skeltonpos.Length; i++)
+
+		if (m_awakeningMode)
 		{
-			m_skelton.GetComponent<SkeletonMove>().SetPlayer(m_player);
-			Instantiate(m_skelton, m_skeltonpos[i].transform.position, Quaternion.identity);
+			m_awakeningMoveSkeleton();
 		}
+		else
+		{
+			for (int i = 0; i < m_skeltonpos.Length; i++)
+			{
+				m_skelton.GetComponent<SkeletonMove>().SetPlayer(m_player);
+				Instantiate(m_skelton, m_skeltonpos[i].transform.position, Quaternion.identity);
+			}
+		}
+
 		SoundEffect.Play2D(m_clip[3]);
 
 		m_bossAttackPattern++;
+	}
+
+	private void m_awakeningMoveSkeleton() // 覚醒中の時のスケルトン生成
+	{
+		for (int i = 0; i < m_awakeningSkeltonPos.Length; i++)
+		{
+			m_awakeningSkelton.GetComponent<SkeletonMove>().SetPlayer(m_player);
+			Instantiate(m_awakeningSkelton, m_awakeningSkeltonPos[i].transform.position, Quaternion.identity);
+		}
 	}
 
 
@@ -322,6 +365,7 @@ public class BossMove : MonoBehaviour
 					for (int i = 0; i < m_cursePos.Length; i++)
 					{
 						m_skeltonHead.GetComponent<CurseSkeletonHead>().SetPlayer(m_lookPlayer);
+						m_skeltonHead.GetComponent<BossCruseDamage>().SetPlayer(m_player);
 						Instantiate(m_skeltonHead, m_cursePos[i].transform.position, Quaternion.identity);
 					}
 					break;
@@ -331,6 +375,7 @@ public class BossMove : MonoBehaviour
 					for (int i = 0; i < m_cursePos.Length; i++)
 					{
 						m_skeltonHead.GetComponent<CurseSkeletonHead>().SetPlayer(m_lookPlayer);
+						m_skeltonHead.GetComponent<BossCruseDamage>().SetPlayer(m_player);
 						Instantiate(m_skeltonHead, m_cursePos2[i].transform.position, Quaternion.identity);
 					}
 					break;
@@ -387,11 +432,22 @@ public class BossMove : MonoBehaviour
 		{
 			m_grave[i].SetActive(true);
 		}
-
+		m_effect[4].SetActive(true);
+		m_effect[5].SetActive(true);
+		m_awakeningMode = true;
 		m_shield.SetActive(true);
 		SoundEffect.Play2D(m_clip[9]);
 		m_collider.enabled = false;
 		gameManager.GetComponent<GameManager>().BgmChange();
+
+		if(m_bossAttackPattern == 0)
+		{
+			m_bossAttackPattern++;
+			m_magicNumber = 0;
+			m_magicAttack = false;
+			m_magicCoolDown = 0f;
+			m_onAttack = false;
+		}
 	}
 
 	public void ShieldAnimationEnd()

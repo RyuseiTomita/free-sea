@@ -24,5 +24,10 @@ public class PlayerAttackHit : MonoBehaviour
 		{
 			SoundEffect.Play2D(m_clips[0]);
 		}
+
+		if(other.gameObject.CompareTag("Skelton"))
+		{
+			other.GetComponent<SkeletonMove>().PlayerAttackHit();
+		}
 	}
 }

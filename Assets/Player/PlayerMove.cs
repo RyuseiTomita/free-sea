@@ -63,7 +63,9 @@ public class PlayerMove : MonoBehaviour
 
 	private bool m_canMove; // プレイヤーを動かせれるか
 	private bool m_chargeAttack; // スキルチャージ中
-	public bool m_awakening;	 // スキル発動
+	public bool m_awakening;     // スキル発動
+
+	private bool m_curseRange = false;
 
 	private void Awake()
 	{
@@ -390,6 +392,8 @@ public class PlayerMove : MonoBehaviour
 
 	public void HitCruseAttackExit()
 	{
+		Debug.Log("Player");
+
 		if (m_awakening)
 		{
 			m_speed = SpeedUp;

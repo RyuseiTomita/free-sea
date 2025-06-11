@@ -8,7 +8,7 @@ public class SkeletonMove : MonoBehaviour
 {
 	[SerializeField] GameObject m_boss;
 	[SerializeField] GameObject m_player;
-	[SerializeField] GameObject m_effect;
+	[SerializeField] GameObject[] m_effect;
 	[SerializeField] Transform m_skeleton;
 	[SerializeField] AudioClip[] m_skeletonCilps;
 	 
@@ -55,8 +55,15 @@ public class SkeletonMove : MonoBehaviour
 		{
 			other.gameObject.GetComponent<PlayerMove>().HitSkeletonAttack(m_skeletonAttack);
 			SoundEffect.Play2D(m_skeletonCilps[1]);
-			Instantiate(m_effect, m_skeleton.transform.position + Vector3.up, Quaternion.identity);
+			Instantiate(m_effect[0], m_skeleton.transform.position + Vector3.up, Quaternion.identity);
 			Destroy(this.gameObject);
 		}
+	}
+
+	public void PlayerAttackHit()
+	{
+		SoundEffect.Play2D(m_skeletonCilps[2]);
+		Instantiate(m_effect[1], m_skeleton.transform.position + Vector3.up, Quaternion.identity);
+		Destroy(this.gameObject);
 	}
 }
