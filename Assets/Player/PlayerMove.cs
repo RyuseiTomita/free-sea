@@ -121,11 +121,8 @@ public class PlayerMove : MonoBehaviour
 
 	public void OnMove(InputAction.CallbackContext context)
 	{
-		if (!m_canMove || m_isDeath) return;
-
 		// 入力値に保持しておく
 		m_inputMove = context.ReadValue<Vector2>();
-		m_animator.SetBool("Run", true);
 	}
 
 	public void OnMoveCancel(InputAction.CallbackContext context)
@@ -313,6 +310,7 @@ public class PlayerMove : MonoBehaviour
 
 		if(m_inputMove != Vector2.zero)
 		{
+			m_animator.SetBool("Run", true);
 			// 移動入力がある場合は、振り向き動作も行う
 
 			// 操作入力からY軸周りの目標角度[deg]を計算
