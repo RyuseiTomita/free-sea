@@ -69,6 +69,7 @@ public class BossMove : MonoBehaviour
 
 	// 覚醒モード
 	[SerializeField] GameObject[] m_grave; // 墓の数
+	[SerializeField] GameObject m_sickle;  // 鎌の武器
 	private bool m_awakeningMode; // 敵が覚醒中か
 	private int m_graveCount;
 
@@ -119,7 +120,7 @@ public class BossMove : MonoBehaviour
 		if (m_idleTime <= 0)
 		{
 			m_onMove = false;
-			
+		
 			switch (m_bossAttackPattern)
 			{
 				case 0:
@@ -197,6 +198,7 @@ public class BossMove : MonoBehaviour
 			m_animator.SetTrigger("Death");
 			m_effect[4].SetActive(false);
 			m_effect[5].SetActive(false);
+			m_sickle.SetActive(false);
 		}
 	}
 
@@ -436,6 +438,7 @@ public class BossMove : MonoBehaviour
 		m_effect[5].SetActive(true);
 		m_awakeningMode = true;
 		m_shield.SetActive(true);
+		m_sickle.SetActive(true);
 		SoundEffect.Play2D(m_clip[9]);
 		m_collider.enabled = false;
 		gameManager.GetComponent<GameManager>().BgmChange();
