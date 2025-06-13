@@ -62,10 +62,16 @@ public class BossMove : MonoBehaviour
 	private bool m_gameSet;
 
 	// 攻撃パターン
-	[SerializeField] int m_bossAttackPattern = 0; 
+	[SerializeField] int m_bossAttackPattern = 0;
 	private const float MagicAttackTime = 3f;
 	private const float SkeletonTime = 5f;
 	private const float CurseTime = 3f;
+
+
+	// 覚醒状態の時の攻撃パターン
+	[SerializeField] const float SickleAttackTime = 2f;
+	[SerializeField] float m_takeStandTime; // 溜め時間
+	private bool m_sickleAttack;
 
 	// 覚醒モード
 	[SerializeField] GameObject[] m_grave; // 墓の数
@@ -103,11 +109,13 @@ public class BossMove : MonoBehaviour
 
 		m_isDeath = false;
 		m_awakeningMode = false;
+		m_sickleAttack = false;
 		m_gameSet = false;
 		//m_skeltonSpawn = false;
 		//m_isMove = false;
 
 		m_graveCount = 0;
+		m_takeStandTime = 0;
 	}
 
 
@@ -115,32 +123,70 @@ public class BossMove : MonoBehaviour
 	{
 		slider.value = m_bossHealth;
 
+		//Debug.Log(m_idleTime);
+
 		if (m_isDeath || m_canShield || m_gameSet) return;
 
 		if (m_idleTime <= 0)
 		{
 			m_onMove = false;
 		
-			switch (m_bossAttackPattern)
+			if(!m_awakeningMode)
 			{
-				case 0:
+				Debug.Log("NotAwaken");
+				switch (m_bossAttackPattern)
+				{
+					case 0:
 					{
 						OnMagicAttackTime();
 						m_onAttack = true;
 						break;
 					}
-				case 1:
+					case 1:
 					{
 						SkeltonSpawnAnimation();
 						m_onAttack = true;
 						break;
 					}
-				case 2:
+					case 2:
 					{
 						CurseAttackAnimation();
 						m_onAttack = true;
 						break;
 					}
+				}
+			}
+			else
+			{
+				Debug.Log("YesAwaken");
+				switch (m_bossAttackPattern)
+				{
+					case 0:
+					{
+						OnMagicAttackTime();
+						m_onAttack = true;
+						break;
+					}
+					case 1:
+					{
+						SickleAttackAnimation();
+						m_onAttack = true;
+						break;
+					}
+					case 2:
+					{
+						Debug.Log(m_bossAttackPattern);
+						CurseAttackAnimation();
+						m_onAttack = true;
+						break;
+					}
+					case 3:
+					{
+						SkeltonSpawnAnimation();
+						m_onAttack = true;
+						break;
+					}
+				}
 			}
 		}
 
@@ -205,7 +251,14 @@ public class BossMove : MonoBehaviour
 
 	private void OnMagicAttackTime()
 	{
-		m_idleTime = SkeletonTime;
+		if(!m_awakeningMode)
+		{
+			m_idleTime = SkeletonTime;
+		}
+		else
+		{
+			m_idleTime = SickleAttackTime;
+		}
 		m_animator.SetTrigger("MagicAttack");
 	}
 
@@ -293,6 +346,7 @@ public class BossMove : MonoBehaviour
 		if (m_awakeningMode)
 		{
 			m_awakeningMoveSkeleton();
+			m_bossAttackPattern = 0;
 		}
 		else
 		{
@@ -301,11 +355,10 @@ public class BossMove : MonoBehaviour
 				m_skelton.GetComponent<SkeletonMove>().SetPlayer(m_player);
 				Instantiate(m_skelton, m_skeltonpos[i].transform.position, Quaternion.identity);
 			}
+			m_bossAttackPattern++;
 		}
 
 		SoundEffect.Play2D(m_clip[3]);
-
-		m_bossAttackPattern++;
 	}
 
 	private void m_awakeningMoveSkeleton() // 覚醒中の時のスケルトン生成
@@ -322,7 +375,18 @@ public class BossMove : MonoBehaviour
 	{
 		m_animator.SetTrigger("Curse");
 		m_bossAttackPattern++;
-		m_idleTime = MagicAttackTime;
+
+		if(!m_awakeningMode)
+		{
+			Debug.Log("NotawakeningMode");
+			m_idleTime = MagicAttackTime;
+		}
+		else
+		{
+			Debug.Log("awakeningMode");
+			m_idleTime = SkeletonTime;
+		}
+		
 	}
 
 	public void CurseAttack() // 呪いの攻撃
@@ -384,7 +448,12 @@ public class BossMove : MonoBehaviour
 				}
 		}
 		SoundEffect.Play2D(m_clip[5]);
-		m_bossAttackPattern = 0;
+
+		if(!m_awakeningMode)
+		{
+			Debug.Log("AAAAAAAa");
+			m_bossAttackPattern = 0;
+		}
 	}
 
 	private void CurseDrawTime(float curse)
@@ -413,8 +482,6 @@ public class BossMove : MonoBehaviour
 					}
 			}
 
-
-
 			SoundEffect.Play2D(m_clip[7]);
 
 			m_curseDrawTime = MaxCurseTime;
@@ -423,12 +490,50 @@ public class BossMove : MonoBehaviour
 		}
 	}
 
+	// 覚醒状態の時に発動する鎌の攻撃(近接)
+	private void SickleAttackAnimation()
+	{
+		Debug.Log(m_sickleAttack);
+
+		m_takeStandTime += Time.deltaTime;
+
+		if (m_takeStandTime >= 5f)
+		{
+			m_animator.SetTrigger("SickleAttack");
+		}
+
+		if (m_sickleAttack) return;
+		Debug.Log("ため時間");
+		m_animator.SetTrigger("TakeStand");
+		m_sickleAttack = true;
+	}
+
+	public void SetNext()
+	{
+		
+	}
+
+	public void BossAttackSound()
+	{
+		SoundEffect.Play2D(m_clip[11]);
+	}
+
+	public void SickleAttackEnd()
+	{
+		m_takeStandTime = 0;
+		m_bossAttackPattern++;
+		m_sickleAttack = false;
+		m_onMove = true;
+		m_onAttack = false;
+		m_idleTime = CurseTime;
+	}
+
 	public void ShieldSound()
 	{
 		SoundEffect.Play2D(m_clip[8]);
 	}
 
-	private void ShieldAnimation()
+	public void ShieldAnimation()
 	{
 		for(int i = 0; i < 4; i++)
 		{
@@ -455,6 +560,7 @@ public class BossMove : MonoBehaviour
 
 	public void ShieldAnimationEnd()
 	{
+		m_animator.SetBool("TakeStand", false);
 		m_canShield = false;
 		m_onMove = true;
 	}
