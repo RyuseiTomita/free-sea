@@ -37,7 +37,7 @@ public class BossMove : MonoBehaviour
 	//private bool m_skeltonSpawn;
 
 	// 呪いの攻撃(2パターン)
-	[SerializeField] GameObject m_skeltonHead; // 骸骨の頭
+	[SerializeField] GameObject[] m_skeltonHead; // 骸骨の頭
 	[SerializeField] Transform[] m_cursePos;
 	[SerializeField] Transform[] m_cursePos2;
 	private static int m_curse;
@@ -49,10 +49,15 @@ public class BossMove : MonoBehaviour
 	private bool m_canShield;
 	//private float m_shieldTime;
  
+
+	// 呪いの攻撃のステータス
 	[SerializeField] GameObject m_curseEffect;
 	private float m_curseDrawTime;
-	private const float MaxCurseTime = 15f; 
+	private const float MaxCurseTime = 15f;
+	private const float MaxAwakeningCurseTime = 20f; // 覚醒時の呪い攻撃の持続時間
 	private bool m_curseDrawFlg;
+
+
 	//private GameObject m_curse;
 
 	[SerializeField] float m_idleTime; // 何もしない時間
@@ -71,7 +76,9 @@ public class BossMove : MonoBehaviour
 	// 覚醒状態の時の攻撃パターン
 	[SerializeField] const float SickleAttackTime = 2f;
 	[SerializeField] float m_takeStandTime; // 溜め時間
+	private bool m_sickleChage;
 	private bool m_sickleAttack;
+	private float m_awakeningCurseTime;
 
 	// 覚醒モード
 	[SerializeField] GameObject[] m_grave; // 墓の数
@@ -110,12 +117,14 @@ public class BossMove : MonoBehaviour
 		m_isDeath = false;
 		m_awakeningMode = false;
 		m_sickleAttack = false;
+		m_sickleChage = false;
 		m_gameSet = false;
 		//m_skeltonSpawn = false;
 		//m_isMove = false;
 
 		m_graveCount = 0;
 		m_takeStandTime = 0;
+		m_awakeningCurseTime = 20f;
 	}
 
 
@@ -125,6 +134,21 @@ public class BossMove : MonoBehaviour
 
 		//Debug.Log(m_idleTime);
 
+		//if (m_curseDrawFlg)
+		//{
+		//	if (!m_awakeningMode)
+		//	{
+		//		m_curseDrawTime -= Time.deltaTime;
+
+		//		CurseDrawTime(m_curseDrawTime);
+		//	}
+		//	else
+		//	{
+		//		m_awakeningCurseTime -= Time.deltaTime;
+		//		CurseDrawTime(m_awakeningCurseTime);
+		//	}
+		//}
+
 		if (m_isDeath || m_canShield || m_gameSet) return;
 
 		if (m_idleTime <= 0)
@@ -132,8 +156,7 @@ public class BossMove : MonoBehaviour
 			m_onMove = false;
 		
 			if(!m_awakeningMode)
-			{
-				Debug.Log("NotAwaken");
+			{ 
 				switch (m_bossAttackPattern)
 				{
 					case 0:
@@ -158,7 +181,6 @@ public class BossMove : MonoBehaviour
 			}
 			else
 			{
-				Debug.Log("YesAwaken");
 				switch (m_bossAttackPattern)
 				{
 					case 0:
@@ -175,7 +197,6 @@ public class BossMove : MonoBehaviour
 					}
 					case 2:
 					{
-						Debug.Log(m_bossAttackPattern);
 						CurseAttackAnimation();
 						m_onAttack = true;
 						break;
@@ -193,13 +214,6 @@ public class BossMove : MonoBehaviour
 		if (m_magicAttack)
 		{
 			OnMagicAttack();
-		}
-
-		if(m_curseDrawFlg)
-		{
-			m_curseDrawTime -= Time.deltaTime;
-
-			CurseDrawTime(m_curseDrawTime);
 		}
 
 		if (!m_onAttack)
@@ -244,6 +258,7 @@ public class BossMove : MonoBehaviour
 			m_animator.SetTrigger("Death");
 			m_effect[4].SetActive(false);
 			m_effect[5].SetActive(false);
+			m_effect[6].SetActive(false);
 			m_sickle.SetActive(false);
 		}
 	}
@@ -378,12 +393,10 @@ public class BossMove : MonoBehaviour
 
 		if(!m_awakeningMode)
 		{
-			Debug.Log("NotawakeningMode");
 			m_idleTime = MagicAttackTime;
 		}
 		else
 		{
-			Debug.Log("awakeningMode");
 			m_idleTime = SkeletonTime;
 		}
 		
@@ -424,51 +437,20 @@ public class BossMove : MonoBehaviour
 
 		m_curseDrawFlg = true;
 
-		switch (m_curse)
+		if (m_awakeningMode)
 		{
-			case 0:
-				{
-					for (int i = 0; i < m_cursePos.Length; i++)
-					{
-						m_skeltonHead.GetComponent<CurseSkeletonHead>().SetPlayer(m_lookPlayer);
-						m_skeltonHead.GetComponent<BossCruseDamage>().SetPlayer(m_player);
-						Instantiate(m_skeltonHead, m_cursePos[i].transform.position, Quaternion.identity);
-					}
-					break;
-				}
-			case 1:
-				{
-					for (int i = 0; i < m_cursePos.Length; i++)
-					{
-						m_skeltonHead.GetComponent<CurseSkeletonHead>().SetPlayer(m_lookPlayer);
-						m_skeltonHead.GetComponent<BossCruseDamage>().SetPlayer(m_player);
-						Instantiate(m_skeltonHead, m_cursePos2[i].transform.position, Quaternion.identity);
-					}
-					break;
-				}
+			m_skeltonHead[0] = m_skeltonHead[1];
 		}
-		SoundEffect.Play2D(m_clip[5]);
 
-		if(!m_awakeningMode)
-		{
-			Debug.Log("AAAAAAAa");
-			m_bossAttackPattern = 0;
-		}
-	}
-
-	private void CurseDrawTime(float curse)
-	{
-		curse = m_curseDrawTime;
-
-		if (curse <= 0)
-		{
 			switch (m_curse)
 			{
 				case 0:
 					{
 						for (int i = 0; i < m_cursePos.Length; i++)
 						{
-							Instantiate(m_effect[3], m_cursePos[i].transform.position, Quaternion.Euler(-90, 0, 0));
+							m_skeltonHead[0].GetComponent<CurseSkeletonHead>().SetPlayer(m_lookPlayer);
+							m_skeltonHead[0].GetComponent<BossCruseDamage>().SetPlayer(m_player);
+							Instantiate(m_skeltonHead[0], m_cursePos[i].transform.position, Quaternion.identity);
 						}
 						break;
 					}
@@ -476,36 +458,91 @@ public class BossMove : MonoBehaviour
 					{
 						for (int i = 0; i < m_cursePos.Length; i++)
 						{
-							Instantiate(m_effect[3], m_cursePos2[i].transform.position, Quaternion.Euler(-90, 0, 0));
+							m_skeltonHead[0].GetComponent<CurseSkeletonHead>().SetPlayer(m_lookPlayer);
+							m_skeltonHead[0].GetComponent<BossCruseDamage>().SetPlayer(m_player);
+							Instantiate(m_skeltonHead[0], m_cursePos2[i].transform.position, Quaternion.identity);
 						}
 						break;
 					}
+			
 			}
+		SoundEffect.Play2D(m_clip[5]);
 
-			SoundEffect.Play2D(m_clip[7]);
-
-			m_curseDrawTime = MaxCurseTime;
-
-			m_curseDrawFlg = false;
+		if(!m_awakeningMode)
+		{
+			m_bossAttackPattern = 0;
 		}
 	}
+
+	//private void CurseDrawTime(float curse)
+	//{
+	//	if(!m_awakeningMode)
+	//	{
+	//		curse = m_curseDrawTime;
+	//	}
+	//	else
+	//	{
+	//		curse = m_awakeningCurseTime;
+	//	}
+
+	//	if (curse <= 0)
+	//	{
+	//		switch (m_curse)
+	//		{
+	//			case 0:
+	//				{
+	//					for (int i = 0; i < m_cursePos.Length; i++)
+	//					{
+	//						Instantiate(m_effect[3], m_cursePos[i].transform.position, Quaternion.Euler(-90, 0, 0));
+	//					}
+	//					break;
+	//				}
+	//			case 1:
+	//				{
+	//					for (int i = 0; i < m_cursePos.Length; i++)
+	//					{
+	//						Instantiate(m_effect[3], m_cursePos2[i].transform.position, Quaternion.Euler(-90, 0, 0));
+	//					}
+	//					break;
+	//				}
+	//		}
+
+	//		SoundEffect.Play2D(m_clip[7]);
+
+	//		if(!m_awakeningMode)
+	//		{
+	//			m_curseDrawTime = MaxCurseTime;
+	//		}
+	//		else
+	//		{
+	//			m_awakeningCurseTime = MaxAwakeningCurseTime;
+	//		}
+
+	//		m_curseDrawFlg = false;
+	//	}
+	//}
 
 	// 覚醒状態の時に発動する鎌の攻撃(近接)
 	private void SickleAttackAnimation()
 	{
 		Debug.Log(m_sickleAttack);
 
+		if (m_sickleAttack) return;
 		m_takeStandTime += Time.deltaTime;
 
 		if (m_takeStandTime >= 5f)
 		{
+			m_sickleAttack = true;
+			m_takeStandTime = 0;
 			m_animator.SetTrigger("SickleAttack");
+			m_effect[6].SetActive(false);
 		}
 
-		if (m_sickleAttack) return;
-		Debug.Log("ため時間");
+		if (m_sickleChage) return;
 		m_animator.SetTrigger("TakeStand");
-		m_sickleAttack = true;
+		SoundEffect.Play2D(m_clip[12]);
+		m_sickleChage = true;
+		m_effect[6].SetActive(true);
 	}
 
 	public void SetNext()
@@ -520,12 +557,12 @@ public class BossMove : MonoBehaviour
 
 	public void SickleAttackEnd()
 	{
-		m_takeStandTime = 0;
 		m_bossAttackPattern++;
-		m_sickleAttack = false;
 		m_onMove = true;
 		m_onAttack = false;
 		m_idleTime = CurseTime;
+		m_sickleChage = false;
+		m_sickleAttack = false;
 	}
 
 	public void ShieldSound()

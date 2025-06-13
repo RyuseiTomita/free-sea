@@ -12,7 +12,7 @@ public class SkeletonMove : MonoBehaviour
 	[SerializeField] Transform m_skeleton;
 	[SerializeField] AudioClip[] m_skeletonCilps;
 	 
-	private float m_skeltonDeathTime; // Š[œ‚ª€‚Ê‚Ü‚Å‚ÌŠÔ
+	[SerializeField] float m_skeltonDeathTime; // Š[œ‚ª€‚Ê‚Ü‚Å‚ÌŠÔ
 	private int m_skeletonAttack;
 
 	NavMeshAgent m_agent;
@@ -20,7 +20,6 @@ public class SkeletonMove : MonoBehaviour
 	void Start()
     {
 		m_agent = GetComponent<NavMeshAgent>();
-		m_skeltonDeathTime = 10f;
 		m_skeletonAttack = 2;
 	}
 

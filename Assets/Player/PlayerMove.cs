@@ -264,7 +264,7 @@ public class PlayerMove : MonoBehaviour
 			}
 		}
 
-		if (!m_canMove || m_chargeAttack) return;
+		if (!m_canMove || m_chargeAttack) return; 
 
 			var isGrounded = m_characterController.isGrounded;
 
@@ -326,6 +326,7 @@ public class PlayerMove : MonoBehaviour
 				ref m_turnVelocity,
 				0.1f
 			);
+
 			// オブジェクトの回転を更新
 			m_transform.rotation = Quaternion.Euler(0, angleY, 0);
 		}
@@ -390,8 +391,6 @@ public class PlayerMove : MonoBehaviour
 
 	public void HitCruseAttackExit()
 	{
-		Debug.Log("Player");
-
 		if (m_awakening)
 		{
 			m_speed = SpeedUp;

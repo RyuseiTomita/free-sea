@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3582733649866160684}
   - component: {fileID: 5863422311515287115}
   m_Layer: 0
-  m_Name: CruseSkeltonHead
+  m_Name: AwakeCruseSkeltonHead
   m_TagString: CruseZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -61,7 +61,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ac3c9457e1be324eaea3ca63ca7ff2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_time: 15
+  m_time: 20
 --- !u!135 &3582733649866160684
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -101,7 +101,7 @@ MonoBehaviour:
   m_effect: {fileID: 3432958286849152088, guid: cebd7a2cba4cf49448644717f700bca0,
     type: 3}
   m_transform: {fileID: 5877347845483207280}
-  m_DestroyTime: 15
+  m_DestroyTime: 20
 --- !u!1001 &5725976049315089933
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -120,6 +120,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: CruseSkeltonHead
       objectReference: {fileID: 0}
+    - target: {fileID: 8082435522808778283, guid: 828f3a507479bbe44a80c2ffccb7b514,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 64435601bdee72545b6710bc73cfa3bc, type: 2}
     - target: {fileID: 8606836575472684017, guid: 828f3a507479bbe44a80c2ffccb7b514,
         type: 3}
       propertyPath: m_LocalPosition.x

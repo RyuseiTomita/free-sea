@@ -1370,6 +1370,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 2b9e25c6dc06f4c41b45160ff397a68e, type: 3}
   - {fileID: 8300000, guid: 1612d6095f8324d449d85339f3211a33, type: 3}
   - {fileID: 8300000, guid: 33f903c9d11203841a0acc7b8cc7eec2, type: 3}
+  m_skeltonDeathTime: 15
 --- !u!54 &3062754955171702131
 Rigidbody:
   m_ObjectHideFlags: 0

@@ -5506,7 +5506,7 @@ ParticleSystem:
   ShapeModule:
     serializedVersion: 6
     enabled: 1
-    type: 4
+    type: 6
     angle: 0
     length: 5
     boxThickness: {x: 0, y: 0, z: 0}
@@ -5574,7 +5574,8 @@ ParticleSystem:
           m_PreInfinity: 2
           m_PostInfinity: 2
           m_RotationOrder: 4
-    m_Mesh: {fileID: 0}
+    m_Mesh: {fileID: 9091541074907234286, guid: 968b01ed1a571874bafb2ff97852540f,
+      type: 3}
     m_MeshRenderer: {fileID: 0}
     m_SkinnedMeshRenderer: {fileID: 0}
     m_Sprite: {fileID: 0}
