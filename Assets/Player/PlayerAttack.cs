@@ -6,6 +6,11 @@ public class PlayerAttack : MonoBehaviour
 {
 	[SerializeField] Collider[] m_collider;
 
+	private void Start()
+	{
+		
+	}
+
 	// ƒm[ƒ}ƒ‹ó‘Ô‚Ì‚Ì“–‚½‚è”»’è
 	public void OnAttackNormal()
 	{

@@ -24,7 +24,7 @@ public class BossMagicAttackDamage : MonoBehaviour
 
 	private IEnumerator MagicAttackCollider()
 	{
-		yield return new WaitForSeconds(1);
+		yield return new WaitForSeconds(0.5f);
 		m_collider.enabled = false;
 	}
 }

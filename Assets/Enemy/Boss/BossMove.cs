@@ -55,10 +55,6 @@ public class BossMove : MonoBehaviour
 
 	// 呪いの攻撃のステータス
 	[SerializeField] GameObject m_curseEffect;
-	private float m_curseDrawTime;
-	private const float MaxCurseTime = 15f;
-	private const float MaxAwakeningCurseTime = 20f; // 覚醒時の呪い攻撃の持続時間
-	private bool m_curseDrawFlg;
 
 
 	//private GameObject m_curse;
@@ -98,10 +94,6 @@ public class BossMove : MonoBehaviour
 	{
 		m_onMove = true;
 
-		//m_shieldTime = 5f;
-		m_curseDrawTime = 15f;
-		m_curseDrawFlg = false;
-
 		m_idleTime = 5f;
 
 		m_animator = m_model[0].GetComponent<Animator>();
@@ -131,23 +123,6 @@ public class BossMove : MonoBehaviour
 	void FixedUpdate()
 	{
 		slider.value = m_bossHealth;
-
-		//Debug.Log(m_idleTime);
-
-		//if (m_curseDrawFlg)
-		//{
-		//	if (!m_awakeningMode)
-		//	{
-		//		m_curseDrawTime -= Time.deltaTime;
-
-		//		CurseDrawTime(m_curseDrawTime);
-		//	}
-		//	else
-		//	{
-		//		m_awakeningCurseTime -= Time.deltaTime;
-		//		CurseDrawTime(m_awakeningCurseTime);
-		//	}
-		//}
 
 		if (m_isDeath || m_canShield || m_gameSet) return;
 
@@ -240,7 +215,8 @@ public class BossMove : MonoBehaviour
 
 	// プレイヤーからダメージを食らう
 	public void HitAttack(int hit)
-	{
+	{	
+		Debug.Log(hit);
 		m_bossHealth -= hit;
 
 		if (m_bossHealth <= 100 && !m_isShield) // HPが半分を切ったら覚醒モード
@@ -433,8 +409,6 @@ public class BossMove : MonoBehaviour
 	private IEnumerator Curse()
 	{
 		yield return new WaitForSeconds(4);
-
-		m_curseDrawFlg = true;
 
 		if (m_awakeningMode)
 		{

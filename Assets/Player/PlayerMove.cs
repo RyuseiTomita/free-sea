@@ -30,6 +30,8 @@ public class PlayerMove : MonoBehaviour
 	[Header("カメラ"), SerializeField]
 	private Camera m_targetCamera;
 
+	[SerializeField] GameObject m_player;
+
 	[SerializeField] AudioClip[] m_clip;
 	[SerializeField] AudioClip m_chargeSkillSound;
 
@@ -44,7 +46,7 @@ public class PlayerMove : MonoBehaviour
 	[SerializeField] GameObject m_skillUi;
 
 	[SerializeField] Slider m_slider;
-	[SerializeField] Collider m_collider;
+	[SerializeField] Collider[] m_collider;
 	[SerializeField] int m_playerHeath;
 	private bool m_isDeath;
 
@@ -204,12 +206,14 @@ public class PlayerMove : MonoBehaviour
 		m_animator.SetBool("ChargeSkill",false);
 		m_skillUi.SetActive(false);
 		m_skillImage.GetComponent<SkillTimer>().CoolDown(true);
-		
 
 		SoundEffect.Play2D(m_clip[3]);
 		
 
 		m_speed = SpeedUp;
+
+		m_collider[1].enabled = true;
+		m_collider[0].enabled = false;
 
 		m_effect[0].SetActive(false);
 		m_effect[1].SetActive(true);
@@ -221,6 +225,9 @@ public class PlayerMove : MonoBehaviour
 
 	private void NormalTime()
 	{
+		m_collider[0].enabled = true;
+		m_collider[1].enabled = false;
+
 		m_speed = NormalSpeed;
 		m_sword[0].SetActive(true);
 		m_sword[1].SetActive(false);
@@ -233,16 +240,14 @@ public class PlayerMove : MonoBehaviour
     {
 		m_slider.value = m_playerHeath;
 
-		if (m_isDeath) return;
-
 		if (m_chargeAttack && !m_awakening) // チャージ中かつまだ発動していないとき
 		{
 			m_chargeSkill -= Time.deltaTime;
 
-			if(m_chargeSkill <= 0)
+			if (m_chargeSkill <= 0)
 			{
 				m_awakening = true;
-				SkillActivation();				// 発動
+				SkillActivation();              // 発動
 				m_chargeSkill = MaxSkillCharge;
 			}
 		}
@@ -338,7 +343,6 @@ public class PlayerMove : MonoBehaviour
 	{
 		if(m_playerHeath <= 0)
 		{
-			m_collider.enabled = false;
 			m_isDeath = true;
 			m_animator.SetBool("Death", true);
 			m_boss.GetComponent<BossMove>().GameSet();
@@ -354,7 +358,6 @@ public class PlayerMove : MonoBehaviour
 
 		if (m_playerHeath <= 0)
 		{
-			m_collider.enabled = false;
 			m_isDeath = true; 
 			m_animator.SetBool("Death", true);
 			m_boss.GetComponent<BossMove>().GameSet();
