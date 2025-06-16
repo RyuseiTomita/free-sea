@@ -6,7 +6,7 @@ public class PlayerAttackHit : MonoBehaviour
 {
 	[SerializeField] GameObject m_boss;
 	[SerializeField] AudioClip[] m_clips;
-	private const int m_attack = 2; // ダメージ
+	[SerializeField] int m_attack = 2; // ダメージ
 
 	private void OnTriggerEnter(Collider other)
 	{

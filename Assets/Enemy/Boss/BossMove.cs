@@ -6,7 +6,12 @@ using UnityEngine.UI;
 
 public class BossMove : MonoBehaviour
 {
+	// BossのHp
+	[SerializeField] int m_bossHealth;
+	private bool m_isDeath;
+
 	[SerializeField] GameObject[] m_model;
+	[SerializeField] Collider m_bossCollider;
 	[SerializeField] Slider slider; // HP
 	[SerializeField] Transform m_lookPlayer; // プレイヤーに追従
 	[SerializeField] GameObject m_player;
@@ -25,8 +30,6 @@ public class BossMove : MonoBehaviour
 	private int MaxMagicNumber = 6;
 	private GameObject[] m_magicAttackEffect = new GameObject[10];
 
-	// 覚醒中の時の弾の数
-
 	//　骸骨の召喚
 	[SerializeField] GameObject m_skelton;
 	[SerializeField] Transform[] m_skeltonpos;   // 骸骨のポジション
@@ -44,7 +47,7 @@ public class BossMove : MonoBehaviour
 
 	// シールド
 	[SerializeField] GameObject m_shield;
-	[SerializeField] Collider m_collider;
+	[SerializeField] Collider m_shieldcollider;
 	private bool m_isShield;
 	private bool m_canShield;
 	//private float m_shieldTime;
@@ -73,9 +76,10 @@ public class BossMove : MonoBehaviour
 	private const float CurseTime = 3f;
 
 
-	// 覚醒状態の時の攻撃パターン
+	// 鎌の攻撃(近接)
 	[SerializeField] const float SickleAttackTime = 2f;
 	[SerializeField] float m_takeStandTime; // 溜め時間
+	[SerializeField] Collider m_sickleArea;
 	private bool m_sickleChage;
 	private bool m_sickleAttack;
 	private float m_awakeningCurseTime;
@@ -85,10 +89,6 @@ public class BossMove : MonoBehaviour
 	[SerializeField] GameObject m_sickle;  // 鎌の武器
 	private bool m_awakeningMode; // 敵が覚醒中か
 	private int m_graveCount;
-
-	// BossのHp
-	[SerializeField] int m_bossHealth = 200;
-	private bool m_isDeath;
 
 	[SerializeField] GameObject gameManager;
 
@@ -223,10 +223,9 @@ public class BossMove : MonoBehaviour
 
 		if (!m_onMove) return;
 
-		transform.rotation = Quaternion.Lerp(
-		   transform.rotation,
-		   Quaternion.LookRotation(m_lookPlayer.position - transform.position),
-		   0.2f);
+		Vector3 forward = m_lookPlayer.position - transform.position;
+		forward.Scale(new Vector3(1, 0, 1));
+		transform.rotation = Quaternion.LookRotation(forward.normalized);
 
 		// プレイヤーに向けて移動
 		bool isMove = false;
@@ -244,7 +243,7 @@ public class BossMove : MonoBehaviour
 	{
 		m_bossHealth -= hit;
 
-		if (m_bossHealth <= 75 && !m_isShield) // HPが半分を切ったら覚醒モード
+		if (m_bossHealth <= 100 && !m_isShield) // HPが半分を切ったら覚醒モード
 		{
 			m_isShield = true;
 			m_canShield = true;
@@ -474,54 +473,6 @@ public class BossMove : MonoBehaviour
 		}
 	}
 
-	//private void CurseDrawTime(float curse)
-	//{
-	//	if(!m_awakeningMode)
-	//	{
-	//		curse = m_curseDrawTime;
-	//	}
-	//	else
-	//	{
-	//		curse = m_awakeningCurseTime;
-	//	}
-
-	//	if (curse <= 0)
-	//	{
-	//		switch (m_curse)
-	//		{
-	//			case 0:
-	//				{
-	//					for (int i = 0; i < m_cursePos.Length; i++)
-	//					{
-	//						Instantiate(m_effect[3], m_cursePos[i].transform.position, Quaternion.Euler(-90, 0, 0));
-	//					}
-	//					break;
-	//				}
-	//			case 1:
-	//				{
-	//					for (int i = 0; i < m_cursePos.Length; i++)
-	//					{
-	//						Instantiate(m_effect[3], m_cursePos2[i].transform.position, Quaternion.Euler(-90, 0, 0));
-	//					}
-	//					break;
-	//				}
-	//		}
-
-	//		SoundEffect.Play2D(m_clip[7]);
-
-	//		if(!m_awakeningMode)
-	//		{
-	//			m_curseDrawTime = MaxCurseTime;
-	//		}
-	//		else
-	//		{
-	//			m_awakeningCurseTime = MaxAwakeningCurseTime;
-	//		}
-
-	//		m_curseDrawFlg = false;
-	//	}
-	//}
-
 	// 覚醒状態の時に発動する鎌の攻撃(近接)
 	private void SickleAttackAnimation()
 	{
@@ -535,7 +486,6 @@ public class BossMove : MonoBehaviour
 			m_sickleAttack = true;
 			m_takeStandTime = 0;
 			m_animator.SetTrigger("SickleAttack");
-			m_effect[6].SetActive(false);
 		}
 
 		if (m_sickleChage) return;
@@ -545,9 +495,11 @@ public class BossMove : MonoBehaviour
 		m_effect[6].SetActive(true);
 	}
 
-	public void SetNext()
+	public void BossSlash()
 	{
-		
+		m_effect[7].SetActive(true);
+		m_effect[6].SetActive(false);
+		m_sickleArea.enabled = true;
 	}
 
 	public void BossAttackSound()
@@ -563,6 +515,8 @@ public class BossMove : MonoBehaviour
 		m_idleTime = CurseTime;
 		m_sickleChage = false;
 		m_sickleAttack = false;
+		m_effect[7].SetActive(false);
+		m_sickleArea.enabled = false;
 	}
 
 	public void ShieldSound()
@@ -582,7 +536,8 @@ public class BossMove : MonoBehaviour
 		m_shield.SetActive(true);
 		m_sickle.SetActive(true);
 		SoundEffect.Play2D(m_clip[9]);
-		m_collider.enabled = false;
+		m_bossCollider.enabled = false;
+		m_shieldcollider.enabled = true;
 		gameManager.GetComponent<GameManager>().BgmChange();
 
 		if(m_bossAttackPattern == 0)
@@ -609,7 +564,8 @@ public class BossMove : MonoBehaviour
 		if (m_graveCount >= 4)
 		{
 			SoundEffect.Play2D(m_clip[10]);
-			m_collider.enabled = true;
+			m_bossCollider.enabled = true;
+			m_shieldcollider.enabled = false;
 			m_shield.SetActive(false);
 		}
 	}

@@ -53,7 +53,6 @@ public class SkeletonMove : MonoBehaviour
 		if (other.gameObject.CompareTag("Player"))
 		{
 			other.gameObject.GetComponent<PlayerMove>().HitSkeletonAttack(m_skeletonAttack);
-			SoundEffect.Play2D(m_skeletonCilps[1]);
 			Instantiate(m_effect[0], m_skeleton.transform.position + Vector3.up, Quaternion.identity);
 			Destroy(this.gameObject);
 		}

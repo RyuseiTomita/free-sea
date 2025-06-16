@@ -9,6 +9,7 @@ TagManager:
   - CruseZone
   - Ground
   - Skelton
+  - SickleArea
   layers:
   - Default
   - TransparentFX

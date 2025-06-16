@@ -25,7 +25,6 @@ public class GraveHealth : MonoBehaviour
 
 	public void AttackHit(int damage)
 	{
-		Debug.Log("Hit");
 		m_graveHealth -= damage;
 
 		if(m_graveHealth <= 0)

@@ -363,11 +363,12 @@ public class PlayerMove : MonoBehaviour
 		{
 			if (m_awakening)
 			{
-				m_playerHeath -= 1;
+				SoundEffect.Play2D(m_clip[5]);
 			}
 			else
 			{
 				m_playerHeath -= skeletonAttack;
+				SoundEffect.Play2D(m_clip[6]);
 			}
 		}
 	}
@@ -399,5 +400,10 @@ public class PlayerMove : MonoBehaviour
 		{
 			m_speed = NormalSpeed;
 		}
+	}
+
+	public void HitSickleAttack(int attack)
+	{
+		m_playerHeath -= attack;
 	}
 }
