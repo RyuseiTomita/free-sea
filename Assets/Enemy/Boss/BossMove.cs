@@ -216,10 +216,10 @@ public class BossMove : MonoBehaviour
 	// プレイヤーからダメージを食らう
 	public void HitAttack(int hit)
 	{	
-		Debug.Log(hit);
 		m_bossHealth -= hit;
+		Debug.Log(hit);
 
-		if (m_bossHealth <= 100 && !m_isShield) // HPが半分を切ったら覚醒モード
+		if (m_bossHealth <= 270 && !m_isShield) // HPが半分を切ったら覚醒モード
 		{
 			m_isShield = true;
 			m_canShield = true;

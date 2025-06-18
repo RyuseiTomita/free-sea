@@ -46,7 +46,7 @@ public class PlayerMove : MonoBehaviour
 	[SerializeField] GameObject m_skillUi;
 
 	[SerializeField] Slider m_slider;
-	[SerializeField] Collider[] m_collider;
+	//[SerializeField] Collider[] m_collider;
 	[SerializeField] int m_playerHeath;
 	private bool m_isDeath;
 
@@ -65,9 +65,7 @@ public class PlayerMove : MonoBehaviour
 
 	private bool m_canMove; // プレイヤーを動かせれるか
 	private bool m_chargeAttack; // スキルチャージ中
-	public bool m_awakening;     // スキル発動
-
-	private bool m_curseRange = false;
+	private bool m_awakening;     // スキル発動
 
 	private void Awake()
 	{
@@ -212,9 +210,6 @@ public class PlayerMove : MonoBehaviour
 
 		m_speed = SpeedUp;
 
-		m_collider[1].enabled = true;
-		m_collider[0].enabled = false;
-
 		m_effect[0].SetActive(false);
 		m_effect[1].SetActive(true);
 		m_effect[2].SetActive(true);
@@ -225,9 +220,6 @@ public class PlayerMove : MonoBehaviour
 
 	private void NormalTime()
 	{
-		m_collider[0].enabled = true;
-		m_collider[1].enabled = false;
-
 		m_speed = NormalSpeed;
 		m_sword[0].SetActive(true);
 		m_sword[1].SetActive(false);
