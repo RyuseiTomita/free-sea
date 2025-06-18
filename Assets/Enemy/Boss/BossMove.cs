@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
 using UnityEngine.UI;
 
 public class BossMove : MonoBehaviour
@@ -230,6 +231,7 @@ public class BossMove : MonoBehaviour
 		else if(m_bossHealth <= 0) // HPがなくなったら死ぬ
 		{
 			m_isDeath = true;
+			m_player.GetComponent<PlayerMove>().GameSet();
 			m_animator.SetTrigger("Death");
 			m_effect[4].SetActive(false);
 			m_effect[5].SetActive(false);
@@ -545,8 +547,9 @@ public class BossMove : MonoBehaviour
 	}
 
 	// ゲームセット(playerが負けたら)
-	public void GameSet()
+	public void GameSet(bool gameSet)
 	{
-		m_gameSet = true;
+		m_gameSet = gameSet;
+		m_animator.SetBool("Walk", false);
 	}
 }

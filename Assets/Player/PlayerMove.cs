@@ -31,6 +31,7 @@ public class PlayerMove : MonoBehaviour
 	private Camera m_targetCamera;
 
 	[SerializeField] GameObject m_player;
+	[SerializeField] Collider m_collider;
 
 	[SerializeField] AudioClip[] m_clip;
 	[SerializeField] AudioClip m_chargeSkillSound;
@@ -67,6 +68,8 @@ public class PlayerMove : MonoBehaviour
 	private bool m_chargeAttack; // スキルチャージ中
 	private bool m_awakening;     // スキル発動
 
+	private bool m_gameSet;
+
 	private void Awake()
 	{
 		m_transform = transform;
@@ -87,6 +90,7 @@ public class PlayerMove : MonoBehaviour
 	private void Start()
 	{
 		m_canMove = true;
+		m_gameSet = false;
 		NormalTime();
 	}
 
@@ -121,6 +125,8 @@ public class PlayerMove : MonoBehaviour
 
 	public void OnMove(InputAction.CallbackContext context)
 	{
+		if (m_gameSet) return;
+
 		// 入力値に保持しておく
 		m_inputMove = context.ReadValue<Vector2>();
 	}
@@ -232,6 +238,8 @@ public class PlayerMove : MonoBehaviour
     {
 		m_slider.value = m_playerHeath;
 
+		if (m_isDeath) return;
+
 		if (m_chargeAttack && !m_awakening) // チャージ中かつまだ発動していないとき
 		{
 			m_chargeSkill -= Time.deltaTime;
@@ -333,26 +341,25 @@ public class PlayerMove : MonoBehaviour
 
 	public void HitMagicAttack(int magicAttack) // MagicAttack
 	{
-		if(m_playerHeath <= 0)
+		m_playerHeath -= magicAttack;
+
+		if (m_playerHeath <= 0)
 		{
 			m_isDeath = true;
 			m_animator.SetBool("Death", true);
-			m_boss.GetComponent<BossMove>().GameSet();
-		}
-		else
-		{
-			m_playerHeath -= magicAttack;
+			m_boss.GetComponent<BossMove>().GameSet(true);
 		}
 	}
 
 	public void HitSkeletonAttack(int skeletonAttack) // 骸骨
 	{
+		m_playerHeath -= skeletonAttack;
 
 		if (m_playerHeath <= 0)
 		{
 			m_isDeath = true; 
 			m_animator.SetBool("Death", true);
-			m_boss.GetComponent<BossMove>().GameSet();
+			m_boss.GetComponent<BossMove>().GameSet(true);
 		}
 		else
 		{
@@ -362,7 +369,6 @@ public class PlayerMove : MonoBehaviour
 			}
 			else
 			{
-				m_playerHeath -= skeletonAttack;
 				SoundEffect.Play2D(m_clip[6]);
 			}
 		}
@@ -400,5 +406,11 @@ public class PlayerMove : MonoBehaviour
 	public void HitSickleAttack(int attack)
 	{
 		m_playerHeath -= attack;
+	}
+
+	public void GameSet()
+	{
+		m_gameSet = true;
+		m_collider.enabled = false;
 	}
 }
