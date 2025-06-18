@@ -353,24 +353,22 @@ public class PlayerMove : MonoBehaviour
 
 	public void HitSkeletonAttack(int skeletonAttack) // ä[çú
 	{
-		m_playerHeath -= skeletonAttack;
-
 		if (m_playerHeath <= 0)
 		{
-			m_isDeath = true; 
+			m_isDeath = true;
 			m_animator.SetBool("Death", true);
 			m_boss.GetComponent<BossMove>().GameSet(true);
+			return;
+		}
+
+		if (!m_awakening)
+		{
+			m_playerHeath -= skeletonAttack;
+			SoundEffect.Play2D(m_clip[6]);
 		}
 		else
 		{
-			if (m_awakening)
-			{
-				SoundEffect.Play2D(m_clip[5]);
-			}
-			else
-			{
-				SoundEffect.Play2D(m_clip[6]);
-			}
+			SoundEffect.Play2D(m_clip[5]);
 		}
 	}
 

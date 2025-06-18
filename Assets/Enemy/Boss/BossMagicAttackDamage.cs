@@ -4,12 +4,11 @@ using UnityEngine;
 
 public class BossMagicAttackDamage : MonoBehaviour
 {
-	private int m_damage;
+	[SerializeField] int m_damage;
 	[SerializeField] Collider m_collider;
 
 	private void Start()
 	{
-		m_damage = 5;
 		StartCoroutine(MagicAttackCollider());
 	}
 

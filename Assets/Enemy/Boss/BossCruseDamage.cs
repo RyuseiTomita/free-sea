@@ -11,13 +11,11 @@ public class BossCruseDamage : MonoBehaviour
 	[SerializeField] Transform m_transform;
 
 	private float m_speedReduction; // ‘¬“x’á‰º
-	private bool m_curseRange;
 	[SerializeField] float m_DestroyTime;
 
 	private void Start()
 	{
 		m_speedReduction = 2f; 
-		m_curseRange = true;
 	}
 
 	private void Update()

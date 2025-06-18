@@ -36,8 +36,9 @@ public class BossMove : MonoBehaviour
 	[SerializeField] Transform[] m_skeltonpos;   // 骸骨のポジション
 
 	// 覚醒状態の時のスケルトンPos
-	[SerializeField] GameObject m_awakeningSkelton;
+	[SerializeField] GameObject[] m_awakeningSkelton;
 	[SerializeField] Transform[] m_awakeningSkeltonPos;
+	[SerializeField] Transform[] m_awakeningSkeltonPosEnd;
 	//private bool m_skeltonSpawn;
 
 	// 呪いの攻撃(2パターン)
@@ -79,7 +80,6 @@ public class BossMove : MonoBehaviour
 	[SerializeField] Collider m_sickleArea;
 	private bool m_sickleChage;
 	private bool m_sickleAttack;
-	private float m_awakeningCurseTime;
 
 	// 覚醒モード
 	[SerializeField] GameObject[] m_grave; // 墓の数
@@ -117,7 +117,6 @@ public class BossMove : MonoBehaviour
 
 		m_graveCount = 0;
 		m_takeStandTime = 0;
-		m_awakeningCurseTime = 20f;
 	}
 
 
@@ -218,7 +217,6 @@ public class BossMove : MonoBehaviour
 	public void HitAttack(int hit)
 	{	
 		m_bossHealth -= hit;
-		Debug.Log(hit);
 
 		if (m_bossHealth <= 270 && !m_isShield) // HPが半分を切ったら覚醒モード
 		{
@@ -309,11 +307,17 @@ public class BossMove : MonoBehaviour
 	private void SkeltonSpawnAnimation() // スケルトンスポーンのアニメーション
 	{
 		m_animator.SetTrigger("SkeltonSpawn");
+
 		if(m_awakeningMode)
 		{
 			for (int i = 0; i < m_awakeningSkeltonPos.Length; i++)
 			{
 				Instantiate(m_effect[2], m_awakeningSkeltonPos[i].transform.position, Quaternion.identity);
+			}
+
+			for (int i = 0; i < m_awakeningSkeltonPosEnd.Length; i++)
+			{
+				Instantiate(m_effect[2], m_awakeningSkeltonPosEnd[i].transform.position, Quaternion.identity);
 			}
 		}
 		else
@@ -357,8 +361,14 @@ public class BossMove : MonoBehaviour
 	{
 		for (int i = 0; i < m_awakeningSkeltonPos.Length; i++)
 		{
-			m_awakeningSkelton.GetComponent<SkeletonMove>().SetPlayer(m_player);
-			Instantiate(m_awakeningSkelton, m_awakeningSkeltonPos[i].transform.position, Quaternion.identity);
+			m_awakeningSkelton[0].GetComponent<SkeletonMove>().SetPlayer(m_player);
+			Instantiate(m_awakeningSkelton[0], m_awakeningSkeltonPos[i].transform.position, Quaternion.identity);
+		}
+
+		for(int i = 0; i < m_awakeningSkeltonPosEnd.Length; i++)
+		{
+			m_awakeningSkelton[1].GetComponent<AwakeningSkeltonEndMove>().SetPlayer(m_player);
+			Instantiate(m_awakeningSkelton[1], m_awakeningSkeltonPosEnd[i].transform.position, Quaternion.identity);
 		}
 	}
 
@@ -452,8 +462,6 @@ public class BossMove : MonoBehaviour
 	// 覚醒状態の時に発動する鎌の攻撃(近接)
 	private void SickleAttackAnimation()
 	{
-		Debug.Log(m_sickleAttack);
-
 		if (m_sickleAttack) return;
 		m_takeStandTime += Time.deltaTime;
 
@@ -483,6 +491,11 @@ public class BossMove : MonoBehaviour
 		SoundEffect.Play2D(m_clip[11]);
 	}
 
+	public void SickleAttackColliderEnd()
+	{
+		m_sickleArea.enabled = false;
+	}
+
 	public void SickleAttackEnd()
 	{
 		m_bossAttackPattern++;
@@ -492,7 +505,6 @@ public class BossMove : MonoBehaviour
 		m_sickleChage = false;
 		m_sickleAttack = false;
 		m_effect[7].SetActive(false);
-		m_sickleArea.enabled = false;
 	}
 
 	public void ShieldSound()
