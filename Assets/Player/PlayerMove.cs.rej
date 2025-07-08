@@ -1,0 +1,19 @@
+diff a/Assets/Player/PlayerMove.cs b/Assets/Player/PlayerMove.cs	(rejected hunks)
+@@ -125,8 +125,6 @@
+ 
+ 	public void OnMove(InputAction.CallbackContext context)
+ 	{
+-		if (m_gameSet) return;
+-
+ 		// ���͒l�ɕێ����Ă���
+ 		m_inputMove = context.ReadValue<Vector2>();
+ 	}
+@@ -238,7 +236,7 @@
+     {
+ 		m_slider.value = m_playerHeath;
+ 
+-		if (m_isDeath) return;
++		if (m_isDeath || m_gameSet) return;
+ 
+ 		if (m_chargeAttack && !m_awakening) // �`���[�W�����܂��������Ă��Ȃ��Ƃ�
+ 		{

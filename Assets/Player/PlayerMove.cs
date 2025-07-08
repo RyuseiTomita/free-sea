@@ -4,11 +4,36 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
-//using UnityEngine.UIElements;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerMove : MonoBehaviour
 {
+	private enum SoundType
+	{
+		Sword1,
+		Sword2,
+		Sword3,
+		SkillActivation,
+		Curse,
+		SkeletonNotHit,
+		SkeletonHit,
+	}
+
+	private enum EffectType
+	{
+		SkillChage,
+		SkillActivation,
+		SkillActivationCircle,
+	}
+
+	private enum SwordType
+	{
+		NormalSword,
+		AwakingSword,
+	}
+
+
+
 	[Header("移動の速さ"), SerializeField]
 	private float m_speed;
 
@@ -31,10 +56,10 @@ public class PlayerMove : MonoBehaviour
 	private Camera m_targetCamera;
 
 	[SerializeField] GameObject m_player;
+	[SerializeField] GameObject m_playerDebuffEffect;
 	[SerializeField] Collider m_collider;
 
 	[SerializeField] AudioClip[] m_clip;
-	[SerializeField] AudioClip m_chargeSkillSound;
 
 	[SerializeField] float m_chargeSkill; // 発動までの時間
 	[SerializeField] const float MaxSkillCharge = 3f;
@@ -47,11 +72,12 @@ public class PlayerMove : MonoBehaviour
 	[SerializeField] GameObject m_skillUi;
 
 	[SerializeField] Slider m_slider;
-	//[SerializeField] Collider[] m_collider;
 	[SerializeField] int m_playerHeath;
 	private bool m_isDeath;
 
 	[SerializeField] GameObject m_boss;
+
+	[SerializeField] GameObject m_playerLose;
  
 	private Animator m_animator;
 	private AudioSource audioSource;
@@ -102,10 +128,6 @@ public class PlayerMove : MonoBehaviour
 		m_playerInput.actions["Attack"].performed += OnAttack;
 		m_playerInput.actions["ChargeAttack"].performed += OnChargeAttack;
 		m_playerInput.actions["ChargeAttack"].canceled += OnChargeAttackCansel;
-
-		//m_playerInput.actions["Attack"].canceled += OnAttackCancel;
-
-		//playerInput.actions["Jump"].performed += OnJump;
 	}
 
 	private void OnDisable()
@@ -114,19 +136,11 @@ public class PlayerMove : MonoBehaviour
 		m_playerInput.actions["Move"].canceled -= OnMoveCancel;
 
 		m_playerInput.actions["ChargeAttack"].performed -= OnChargeAttack;
-		//m_playerInput.actions["Attack"].performed -= OnAttack;
-
-
-		//m_playerInput.actions["Attack"].canceled -= OnAttackCancel;
-
-		//playerInput.actions["Jump"].performed -= OnJump;
 	}
 
 
 	public void OnMove(InputAction.CallbackContext context)
 	{
-		if (m_gameSet) return;
-
 		// 入力値に保持しておく
 		m_inputMove = context.ReadValue<Vector2>();
 	}
@@ -136,15 +150,6 @@ public class PlayerMove : MonoBehaviour
 		//入力値を保持しておく　
 		m_inputMove = context.ReadValue<Vector2>();
 		m_animator.SetBool("Run", false);
-	}
-
-	public void OnJump(InputAction.CallbackContext context)
-	{
-		// ボタンが押された瞬間かつ着地している時だけ処理
-		if (!context.performed || !m_characterController.isGrounded) return;
-
-		// 鉛直上向きに速度を与える
-		m_verticalVelocity = m_jumpSpeed;
 	}
 
 	public void OnAttack(InputAction.CallbackContext context)
@@ -170,7 +175,7 @@ public class PlayerMove : MonoBehaviour
 		m_chargeAttack = true;
 		m_animator.SetBool("ChargeSkill", true);
 		audioSource.Play();
-		m_effect[0].SetActive(true);
+		m_effect[(int)EffectType.SkillChage].SetActive(true);
 	}
 
 	public void OnChargeAttackCansel(InputAction.CallbackContext context)
@@ -178,7 +183,7 @@ public class PlayerMove : MonoBehaviour
 		m_chargeAttack = false;
 		m_animator.SetBool("ChargeSkill", false); 
 		audioSource.Stop();
-		m_effect[0].SetActive(false);
+		m_effect[(int)EffectType.SkillChage].SetActive(false);
 	}
 
 
@@ -191,17 +196,17 @@ public class PlayerMove : MonoBehaviour
 
 	public void SwordAudio1()
 	{
-		SoundEffect.Play2D(m_clip[0]);
+		SoundEffect.Play2D(m_clip[(int)SoundType.Sword1]);
 	}
 
 	public void SwordAudio2()
 	{
-		SoundEffect.Play2D(m_clip[1]);
+		SoundEffect.Play2D(m_clip[(int)SoundType.Sword2]);
 	}
 
 	public void SwordAudio3()
 	{
-		SoundEffect.Play2D(m_clip[2]);
+		SoundEffect.Play2D(m_clip[(int)SoundType.Sword3]);
 	}
 
 	private void SkillActivation() // スキル発動
@@ -211,26 +216,26 @@ public class PlayerMove : MonoBehaviour
 		m_skillUi.SetActive(false);
 		m_skillImage.GetComponent<SkillTimer>().CoolDown(true);
 
-		SoundEffect.Play2D(m_clip[3]);
+		SoundEffect.Play2D(m_clip[(int)SoundType.SkillActivation]);
 		
 
 		m_speed = SpeedUp;
 
-		m_effect[0].SetActive(false);
-		m_effect[1].SetActive(true);
-		m_effect[2].SetActive(true);
+		m_effect[(int)EffectType.SkillChage].SetActive(false);
+		m_effect[(int)EffectType.SkillActivation].SetActive(true);
+		m_effect[(int)EffectType.SkillActivationCircle].SetActive(true);
 
-		m_sword[0].SetActive(false);
-		m_sword[1].SetActive(true);
+		m_sword[(int)SwordType.NormalSword].SetActive(false);
+		m_sword[(int)SwordType.AwakingSword].SetActive(true);
 	}
 
 	private void NormalTime()
 	{
 		m_speed = NormalSpeed;
-		m_sword[0].SetActive(true);
-		m_sword[1].SetActive(false);
+		m_sword[(int)SwordType.NormalSword].SetActive(true);
+		m_sword[(int)SwordType.AwakingSword].SetActive(false);
 
-		m_effect[2].SetActive(false);
+		m_effect[(int)EffectType.SkillActivationCircle].SetActive(false);
 		m_skillImage.GetComponent<SkillTimer>().CoolDown(false);
 	}
 
@@ -238,116 +243,125 @@ public class PlayerMove : MonoBehaviour
     {
 		m_slider.value = m_playerHeath;
 
-		if (m_isDeath) return;
+		if (m_gameSet) return;
 
-		if (m_chargeAttack && !m_awakening) // チャージ中かつまだ発動していないとき
+		if (m_isDeath || m_playerHeath <= 0)
 		{
-			m_chargeSkill -= Time.deltaTime;
-
-			if (m_chargeSkill <= 0)
-			{
-				m_awakening = true;
-				SkillActivation();              // 発動
-				m_chargeSkill = MaxSkillCharge;
-			}
+			m_animator.SetBool("Death", true);
+			OnDeath();
 		}
 		else
 		{
-			m_chargeSkill = MaxSkillCharge;
-		}
-
-		if(m_awakening) // 発動中
-		{
-			m_skillActivation -= Time.deltaTime;
-			
-			if(m_skillActivation <= 0)
+			if (m_chargeAttack && !m_awakening) // チャージ中かつまだ発動していないとき
 			{
-				m_awakening = false;
-				m_effect[1].SetActive(false);
-				NormalTime();
-				m_skillActivation = MaxSkillActivation;
-			}
-		}
+				m_chargeSkill -= Time.deltaTime;
 
-		if (!m_canMove || m_chargeAttack) return; 
+				if (m_chargeSkill <= 0)
+				{
+					m_awakening = true;
+					SkillActivation();              // 発動
+					m_chargeSkill = MaxSkillCharge;
+				}
+			}
+			else
+			{
+				m_chargeSkill = MaxSkillCharge;
+			}
+
+			if (m_awakening) // 発動中
+			{
+				m_skillActivation -= Time.deltaTime;
+
+				if (m_skillActivation <= 0)
+				{
+					m_awakening = false;
+					m_effect[(int)EffectType.SkillActivation].SetActive(false);
+					NormalTime();
+					m_skillActivation = MaxSkillActivation;
+				}
+			}
+
+			if (!m_canMove || m_chargeAttack) return;
 
 			var isGrounded = m_characterController.isGrounded;
 
-		if (isGrounded && !m_GroundedPrev)
-		{
-			// 着地する瞬間に落下の初速を指定しておく
-			m_verticalVelocity = -m_initFallSpeed;
-		}
-		else if(!isGrounded)
-		{
-			// 空中にいるときは、下向きに重力加速度を与えて落下させる
-			m_verticalVelocity -= m_gravity * Time.deltaTime;
-
-			// 落下する速さ以上にならないように補正
-			if(m_verticalVelocity <= -m_fallSpeed)
+			if (isGrounded && !m_GroundedPrev)
 			{
-				m_verticalVelocity -= m_fallSpeed;
+				// 着地する瞬間に落下の初速を指定しておく
+				m_verticalVelocity = -m_initFallSpeed;
 			}
-		}
+			else if (!isGrounded)
+			{
+				// 空中にいるときは、下向きに重力加速度を与えて落下させる
+				m_verticalVelocity -= m_gravity * Time.deltaTime;
 
-		m_GroundedPrev = isGrounded;
+				// 落下する速さ以上にならないように補正
+				if (m_verticalVelocity <= -m_fallSpeed)
+				{
+					m_verticalVelocity -= m_fallSpeed;
+				}
+			}
 
-		// カメラの向き(角度[deg])取得
-		var cameraAngleY = m_targetCamera.transform.eulerAngles.y;
+			m_GroundedPrev = isGrounded;
 
-		// 操作入力と鉛直方向速度から、現在速度を計算
-		var moveVelocity = new Vector3(
-			m_inputMove.x * m_speed,
-			m_verticalVelocity,
-			m_inputMove.y * m_speed
-		);
+			// カメラの向き(角度[deg])取得
+			var cameraAngleY = m_targetCamera.transform.eulerAngles.y;
 
-		// カメラの角度部分だけ移動量を回転
-		moveVelocity = Quaternion.Euler(0, cameraAngleY, 0) * moveVelocity;
-
-		// 現フレームの移動量を移動速度から計算
-		var moveDelta = moveVelocity * Time.deltaTime;
-
-		
-
-		// CharactorControllerに移動量を指定し、オブジェクトを動かす
-		m_characterController.Move(moveDelta);
-
-		if(m_inputMove != Vector2.zero)
-		{
-			m_animator.SetBool("Run", true);
-			// 移動入力がある場合は、振り向き動作も行う
-
-			// 操作入力からY軸周りの目標角度[deg]を計算
-			var targetAngleY = -Mathf.Atan2(m_inputMove.y, m_inputMove.x) * Mathf.Rad2Deg + 90;
-
-			// カメラの角度分だけ振り向く角度を補正
-			targetAngleY += cameraAngleY;
-
-			// イージングしながら次の回転速度[deg]を計算
-			var angleY = Mathf.SmoothDampAngle(
-				m_transform.eulerAngles.y,
-				targetAngleY,
-				ref m_turnVelocity,
-				0.1f
+			// 操作入力と鉛直方向速度から、現在速度を計算
+			var moveVelocity = new Vector3(
+				m_inputMove.x * m_speed,
+				m_verticalVelocity,
+				m_inputMove.y * m_speed
 			);
 
-			// オブジェクトの回転を更新
-			m_transform.rotation = Quaternion.Euler(0, angleY, 0);
+			// カメラの角度部分だけ移動量を回転
+			moveVelocity = Quaternion.Euler(0, cameraAngleY, 0) * moveVelocity;
+
+			// 現フレームの移動量を移動速度から計算
+			var moveDelta = moveVelocity * Time.deltaTime;
+
+
+
+			// CharactorControllerに移動量を指定し、オブジェクトを動かす
+			m_characterController.Move(moveDelta);
+
+			if (m_inputMove != Vector2.zero)
+			{
+				m_animator.SetBool("Run", true);
+				// 移動入力がある場合は、振り向き動作も行う
+
+				// 操作入力からY軸周りの目標角度[deg]を計算
+				var targetAngleY = -Mathf.Atan2(m_inputMove.y, m_inputMove.x) * Mathf.Rad2Deg + 90;
+
+				// カメラの角度分だけ振り向く角度を補正
+				targetAngleY += cameraAngleY;
+
+				// イージングしながら次の回転速度[deg]を計算
+				var angleY = Mathf.SmoothDampAngle(
+					m_transform.eulerAngles.y,
+					targetAngleY,
+					ref m_turnVelocity,
+					0.1f
+				);
+
+				// オブジェクトの回転を更新
+				m_transform.rotation = Quaternion.Euler(0, angleY, 0);
+			}
 		}
 	}
 
 	// 敵からダメージを食らう
 
-	public void HitMagicAttack(int magicAttack) // MagicAttack
+	public void HitDamage(int hit) // MagicAttack
 	{
-		m_playerHeath -= magicAttack;
+		m_playerHeath -= hit;
 
 		if (m_playerHeath <= 0)
 		{
 			m_isDeath = true;
 			m_animator.SetBool("Death", true);
 			m_boss.GetComponent<BossMove>().GameSet(true);
+			OnDeath();
 		}
 	}
 
@@ -358,17 +372,17 @@ public class PlayerMove : MonoBehaviour
 			m_isDeath = true;
 			m_animator.SetBool("Death", true);
 			m_boss.GetComponent<BossMove>().GameSet(true);
-			return;
+			OnDeath();
 		}
 
 		if (!m_awakening)
 		{
 			m_playerHeath -= skeletonAttack;
-			SoundEffect.Play2D(m_clip[6]);
+			SoundEffect.Play2D(m_clip[(int)SoundType.SkeletonHit]);
 		}
 		else
 		{
-			SoundEffect.Play2D(m_clip[5]);
+			SoundEffect.Play2D(m_clip[(int)SoundType.SkeletonNotHit]);
 		}
 	}
 
@@ -382,11 +396,12 @@ public class PlayerMove : MonoBehaviour
 		{
 			m_speed = cruseAttack;
 		}
+		m_playerDebuffEffect.SetActive(true);
 	}
 
 	public void HitCruseAttackSound()
 	{
-		SoundEffect.Play2D(m_clip[4]);
+		SoundEffect.Play2D(m_clip[(int)SoundType.Curse]);
 	}
 
 	public void HitCruseAttackExit()
@@ -399,16 +414,18 @@ public class PlayerMove : MonoBehaviour
 		{
 			m_speed = NormalSpeed;
 		}
+		m_playerDebuffEffect.SetActive(false);
 	}
-
-	public void HitSickleAttack(int attack)
-	{
-		m_playerHeath -= attack;
-	}
-
 	public void GameSet()
 	{
 		m_gameSet = true;
 		m_collider.enabled = false;
+	}
+
+	private void OnDeath() // プレイヤーが死んだら
+	{
+		if (m_gameSet) return;
+		m_playerLose.GetComponent<GameSetLose>().PlayerLose(true);
+		m_playerDebuffEffect.SetActive(false);
 	}
 }
