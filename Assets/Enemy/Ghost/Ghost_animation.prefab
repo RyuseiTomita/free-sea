@@ -178,7 +178,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88ef2bfee2c87144781881e9fa685db3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_skeltonDeathTime: 10
+  m_ghostDeathTime: 10
   m_player: {fileID: 0}
   m_ghostPos: {fileID: 658878252248194454}
   m_grave: {fileID: 8437923097312728208, guid: db22229c67e8da3468c144266082bf84, type: 3}

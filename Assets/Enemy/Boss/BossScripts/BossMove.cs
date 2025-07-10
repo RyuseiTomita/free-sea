@@ -120,7 +120,6 @@ public class BossMove : MonoBehaviour
 	private const float SkeletonTime = 5f;
 	private const float CurseTime = 3f;
 	private const float SickleAttackTime = 2f;
-	private const float AreaDamageTime = 3f;
 
 	// 鎌の攻撃(近接)
 	[SerializeField] float m_takeStandTime; // 溜め時間
@@ -189,6 +188,7 @@ public class BossMove : MonoBehaviour
 		
 			if(!m_awakeningMode)
 			{ 
+				// 通常時
 				switch (m_bossAttackPattern)
 				{
 					case 0:
@@ -213,6 +213,7 @@ public class BossMove : MonoBehaviour
 			}
 			else
 			{
+				// 覚醒モードに入ったら
 				switch (m_bossAttackPattern)
 				{
 					case 0:
@@ -261,9 +262,15 @@ public class BossMove : MonoBehaviour
 
 		if (!m_onMove) return;
 
+
+		// プレイヤーを向く
 		Vector3 forward = m_lookPlayer.position - transform.position;
 		forward.Scale(new Vector3(1, 0, 1));
-		transform.rotation = Quaternion.LookRotation(forward.normalized);
+
+		transform.rotation = Quaternion.Lerp(
+			transform.rotation,
+			Quaternion.LookRotation(forward.normalized.normalized),
+			0.2f);
 
 		// プレイヤーに向けて移動
 		bool isMove = false;
@@ -297,16 +304,12 @@ public class BossMove : MonoBehaviour
 			m_sickle.SetActive(false);
 			m_sickDrawGauge.SetActive(false);
 			m_areaDamageGauge.SetActive(false);
+			m_effect[(int)EffectType.AwakeningBossCircle].SetActive(false);
 			OnDeath();
 
 			for(int i = 0; i < m_texts.Length; i++)
 			{
 				m_texts[i].SetActive(false);
-			}
-
-			for(int i = 0; i < m_effect.Length; i++)
-			{
-				m_effect[i].SetActive(false);
 			}
 		}
 	}
@@ -333,8 +336,6 @@ public class BossMove : MonoBehaviour
 
 	private void OnMagicAttack()
 	{
-		m_onMove = true;
-
 		if(m_awakeningMode)
 		{
 			MaxMagicNumber = MaxAwakeingMagicAttack;
@@ -346,15 +347,17 @@ public class BossMove : MonoBehaviour
 			{
 				m_bossAttackPattern = (int)AttackPatternType.AreaDamage;
 			}
-			
-			m_magicNumber = 0;
+			else
+			{
+				m_bossAttackPattern = (int)AttackPatternType.SkeltonSpawn;
+			}
+
+				m_magicNumber = 0;
 			m_magicAttack = false;
 			m_magicCoolDown = 0f;
 			m_onAttack = false;
-			m_texts[(int)TextType.MagicAttack].SetActive(false);
 
-			if (!m_nowShield && m_awakeningMode) return;
-			m_bossAttackPattern = (int)AttackPatternType.SkeltonSpawn;
+			m_texts[(int)TextType.MagicAttack].SetActive(false);
 		}
 		else
 		{
@@ -412,11 +415,15 @@ public class BossMove : MonoBehaviour
 		
 	}
 
+	public void MagicAnimationEnd()
+	{
+		m_onMove = true;
+	}
+
 	public void SummonMob() //骸骨スポーン
 	{
 		m_texts[(int)TextType.Skeleton].SetActive(false);
-		m_onMove = true;
-		m_onAttack = false;
+		
 
 		// 第二フェーズになったら
 		if (m_awakeningMode)
@@ -437,6 +444,12 @@ public class BossMove : MonoBehaviour
 		m_bossAttackPattern = (int)AttackPatternType.CurseAttack;
 
 		SoundEffect.Play2D(m_clip[(int)SoundType.SkeletonSpawnChage]);
+	}
+
+	public void SpawnAnimationEnd()
+	{
+		m_onMove = true;
+		m_onAttack = false;
 	}
 
 	private void AwakeingEnemy() // 覚醒中の時のスケルトンと幽霊
@@ -473,7 +486,6 @@ public class BossMove : MonoBehaviour
 
 	public void CurseAttack() // 呪いの攻撃
 	{
-		m_onMove = true;
 		m_curse = UnityEngine.Random.Range(0, 2);
 
 		Transform[] cursePos = m_curse == 0 ? m_cursePos : m_cursePos2;
@@ -483,9 +495,14 @@ public class BossMove : MonoBehaviour
 			Instantiate(m_curseEffect, cursePos[i].transform.position, Quaternion.identity);
 		}
 
-		m_onAttack = false;
 		SoundEffect.Play2D(m_clip[(int)SoundType.CurseAttackChage]);
 		StartCoroutine(Curse());
+	}
+
+	public void CruseAnimationEnd()
+	{
+		m_onMove = true;
+		m_onAttack = false;
 	}
 
 	private IEnumerator Curse()
@@ -534,7 +551,7 @@ public class BossMove : MonoBehaviour
 		m_sickleChage = true;
 	}
 
-	public void BossSlash()
+	public void BossSlash() // 攻撃アニメーション中
 	{
 		m_effect[(int)EffectType.SickleAttackSlash].SetActive(true);
 		m_effect[(int)EffectType.SickleAttack].SetActive(false);
@@ -580,13 +597,13 @@ public class BossMove : MonoBehaviour
 		StartCoroutine(AreaDamageEffect());
 	}
 
-	public void AreaDamageEnd()
+	public void AreaDamageEnd() // エリアダメージのアニメーション終了後敵が動き出す
 	{
 		m_onMove = true;
 		m_onAttack = false;
 	}
 
-	private IEnumerator AreaDamageEffect()
+	private IEnumerator AreaDamageEffect() // エリアダメージ攻撃発動
 	{
 		yield return new WaitForSeconds(10);
 
@@ -613,7 +630,7 @@ public class BossMove : MonoBehaviour
 		SoundEffect.Play2D(m_clip[(int)SoundType.ShieldChage]);
 	}
 
-	public void ShieldAnimation()
+	public void ShieldAnimation() // シールド発動
 	{
 		m_texts[(int)TextType.Shield].SetActive(true); // [トゥーム・シールド]
 
@@ -634,9 +651,10 @@ public class BossMove : MonoBehaviour
 		gameManager.GetComponent<GameManager>().BgmChange();
 		SoundEffect.Play2D(m_clip[(int)SoundType.Shield]);
 
+
+		// マジックアタックの途中に覚醒モード入ったら次の攻撃に移す
 		if(m_bossAttackPattern == (int)AttackPatternType.MagicAttack)
 		{
-			Debug.Log("MAGIC");
 			m_bossAttackPattern = (int)AttackPatternType.SkeltonSpawn;
 			m_magicNumber = 0;
 			m_magicAttack = false;
@@ -675,7 +693,8 @@ public class BossMove : MonoBehaviour
 		m_animator.SetBool("Walk", false);
 	}
 
-	private void OnDeath()
+	// 敵が死んだら
+	private void OnDeath() 
 	{
 		if (m_gameSet) return;
 		playerWin.GetComponent<GameSetWin>().PlayerWin(true);

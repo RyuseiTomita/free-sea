@@ -54,10 +54,30 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8446585134847654013}
     m_Modifications:
+    - target: {fileID: 1318935079978438865, guid: 789f2866ce6b54a4fbfeeff468fee94c,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2319904205370560433, guid: 789f2866ce6b54a4fbfeeff468fee94c,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3280519133223516631, guid: 789f2866ce6b54a4fbfeeff468fee94c,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3280519133390621005, guid: 789f2866ce6b54a4fbfeeff468fee94c,
         type: 3}
       propertyPath: m_Name
       value: SkeletonSummon
+      objectReference: {fileID: 0}
+    - target: {fileID: 3280519133390621005, guid: 789f2866ce6b54a4fbfeeff468fee94c,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3280519133390621042, guid: 789f2866ce6b54a4fbfeeff468fee94c,
         type: 3}
@@ -112,6 +132,11 @@ PrefabInstance:
     - target: {fileID: 3280519133430969737, guid: 789f2866ce6b54a4fbfeeff468fee94c,
         type: 3}
       propertyPath: m_Intensity
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3280519133430969738, guid: 789f2866ce6b54a4fbfeeff468fee94c,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

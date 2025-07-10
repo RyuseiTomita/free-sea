@@ -6,7 +6,7 @@ using UnityEngine.AI;
 public class GhostMove : MonoBehaviour
 {
 
-	[SerializeField] float m_skeltonDeathTime; // Š[œ‚ª€‚Ê‚Ü‚Å‚ÌŠÔ
+	[SerializeField] float m_ghostDeathTime; // —H—ì‚ª€‚Ê‚Ü‚Å‚ÌŠÔ
 	[SerializeField] GameObject m_player;
 	[SerializeField] Transform m_ghostPos;
 	[SerializeField] GameObject m_grave;
@@ -32,9 +32,9 @@ public class GhostMove : MonoBehaviour
 
 	private void GhostAttack()
 	{
-		m_skeltonDeathTime -= Time.deltaTime;
+		m_ghostDeathTime -= Time.deltaTime;
 
-		if (m_skeltonDeathTime <= 0)
+		if (m_ghostDeathTime <= 0)
 		{
 			Instantiate(m_grave, m_ghostPos.transform.position, Quaternion.identity);
 			Destroy(this.gameObject);

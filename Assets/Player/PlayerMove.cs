@@ -40,18 +40,6 @@ public class PlayerMove : MonoBehaviour
 	[SerializeField] const float NormalSpeed = 5;
 	private const float SpeedUp = 7;
 
-	[Header("ジャンプする瞬間の速さ"), SerializeField]
-	private float m_jumpSpeed = 30.0f;
-
-	[Header("重力加速度"), SerializeField]
-	private float m_gravity = 15.0f;
-
-	[Header("落下時の速さ制限(Infinityで無制限)"), SerializeField]
-	private float m_fallSpeed = 10.0f;
-
-	[Header("落下の初速"), SerializeField]
-	private float m_initFallSpeed = 2.0f;
-
 	[Header("カメラ"), SerializeField]
 	private Camera m_targetCamera;
 
@@ -61,6 +49,7 @@ public class PlayerMove : MonoBehaviour
 
 	[SerializeField] AudioClip[] m_clip;
 
+	// スキル
 	[SerializeField] float m_chargeSkill; // 発動までの時間
 	[SerializeField] const float MaxSkillCharge = 3f;
 	[SerializeField] float m_skillActivation;   // 発動時間
@@ -71,7 +60,8 @@ public class PlayerMove : MonoBehaviour
 	[SerializeField] GameObject m_skillImage;
 	[SerializeField] GameObject m_skillUi;
 
-	[SerializeField] Slider m_slider;
+	// 
+	[SerializeField] Slider m_playerHp;
 	[SerializeField] int m_playerHeath;
 	private bool m_isDeath;
 
@@ -88,7 +78,6 @@ public class PlayerMove : MonoBehaviour
 	private Vector2 m_inputMove;
 	private float m_verticalVelocity;
 	private float m_turnVelocity;
-	private bool m_GroundedPrev;
 
 	private bool m_canMove; // プレイヤーを動かせれるか
 	private bool m_chargeAttack; // スキルチャージ中
@@ -241,18 +230,19 @@ public class PlayerMove : MonoBehaviour
 
 	private void FixedUpdate()
     {
-		m_slider.value = m_playerHeath;
+		m_playerHp.value = m_playerHeath;
 
 		if (m_gameSet) return;
 
-		if (m_isDeath || m_playerHeath <= 0)
+		if (m_playerHeath <= 0)
 		{
 			m_animator.SetBool("Death", true);
+			m_boss.GetComponent<BossMove>().GameSet(true);
 			OnDeath();
 		}
 		else
 		{
-			if (m_chargeAttack && !m_awakening) // チャージ中かつまだ発動していないとき
+			if (m_chargeAttack) // チャージ中かつまだ発動していないとき
 			{
 				m_chargeSkill -= Time.deltaTime;
 
@@ -274,35 +264,14 @@ public class PlayerMove : MonoBehaviour
 
 				if (m_skillActivation <= 0)
 				{
-					m_awakening = false;
 					m_effect[(int)EffectType.SkillActivation].SetActive(false);
+					m_awakening = false;
 					NormalTime();
 					m_skillActivation = MaxSkillActivation;
 				}
 			}
 
 			if (!m_canMove || m_chargeAttack) return;
-
-			var isGrounded = m_characterController.isGrounded;
-
-			if (isGrounded && !m_GroundedPrev)
-			{
-				// 着地する瞬間に落下の初速を指定しておく
-				m_verticalVelocity = -m_initFallSpeed;
-			}
-			else if (!isGrounded)
-			{
-				// 空中にいるときは、下向きに重力加速度を与えて落下させる
-				m_verticalVelocity -= m_gravity * Time.deltaTime;
-
-				// 落下する速さ以上にならないように補正
-				if (m_verticalVelocity <= -m_fallSpeed)
-				{
-					m_verticalVelocity -= m_fallSpeed;
-				}
-			}
-
-			m_GroundedPrev = isGrounded;
 
 			// カメラの向き(角度[deg])取得
 			var cameraAngleY = m_targetCamera.transform.eulerAngles.y;
@@ -328,7 +297,6 @@ public class PlayerMove : MonoBehaviour
 			if (m_inputMove != Vector2.zero)
 			{
 				m_animator.SetBool("Run", true);
-				// 移動入力がある場合は、振り向き動作も行う
 
 				// 操作入力からY軸周りの目標角度[deg]を計算
 				var targetAngleY = -Mathf.Atan2(m_inputMove.y, m_inputMove.x) * Mathf.Rad2Deg + 90;
@@ -355,26 +323,10 @@ public class PlayerMove : MonoBehaviour
 	public void HitDamage(int hit) // MagicAttack
 	{
 		m_playerHeath -= hit;
-
-		if (m_playerHeath <= 0)
-		{
-			m_isDeath = true;
-			m_animator.SetBool("Death", true);
-			m_boss.GetComponent<BossMove>().GameSet(true);
-			OnDeath();
-		}
 	}
 
 	public void HitSkeletonAttack(int skeletonAttack) // 骸骨
 	{
-		if (m_playerHeath <= 0)
-		{
-			m_isDeath = true;
-			m_animator.SetBool("Death", true);
-			m_boss.GetComponent<BossMove>().GameSet(true);
-			OnDeath();
-		}
-
 		if (!m_awakening)
 		{
 			m_playerHeath -= skeletonAttack;
