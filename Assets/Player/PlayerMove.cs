@@ -32,6 +32,8 @@ public class PlayerMove : MonoBehaviour
 		AwakingSword,
 	}
 
+	[SerializeField] int m_playerHeath;
+	[SerializeField] Slider m_playerHp;
 
 
 	[Header("移動の速さ"), SerializeField]
@@ -60,9 +62,7 @@ public class PlayerMove : MonoBehaviour
 	[SerializeField] GameObject m_skillImage;
 	[SerializeField] GameObject m_skillUi;
 
-	// 
-	[SerializeField] Slider m_playerHp;
-	[SerializeField] int m_playerHeath;
+
 	private bool m_isDeath;
 
 	[SerializeField] GameObject m_boss;
@@ -158,7 +158,7 @@ public class PlayerMove : MonoBehaviour
 		m_chargeAttack = true;
 		m_animator.SetBool("ChargeSkill", true);
 		audioSource.Play();
-		m_effect[(int)EffectType.SkillChage].SetActive(true);
+		m_effect[(int)EffectType.SkillChage].SetActive(m_chargeAttack);
 	}
 
 	public void OnChargeAttackCansel(InputAction.CallbackContext context)
@@ -166,7 +166,7 @@ public class PlayerMove : MonoBehaviour
 		m_chargeAttack = false;
 		m_animator.SetBool("ChargeSkill", false); 
 		audioSource.Stop();
-		m_effect[(int)EffectType.SkillChage].SetActive(false);
+		m_effect[(int)EffectType.SkillChage].SetActive(m_chargeAttack);
 	}
 
 
@@ -204,117 +204,128 @@ public class PlayerMove : MonoBehaviour
 
 		m_speed = SpeedUp;
 
-		m_effect[(int)EffectType.SkillChage].SetActive(false);
-		m_effect[(int)EffectType.SkillActivation].SetActive(true);
-		m_effect[(int)EffectType.SkillActivationCircle].SetActive(true);
+		// スキル発動中のEffectを生成
+		m_effect[(int)EffectType.SkillChage].SetActive(m_awakening);
+		m_effect[(int)EffectType.SkillActivation].SetActive(m_awakening);
+		m_effect[(int)EffectType.SkillActivationCircle].SetActive(m_awakening);
 
+		// 剣を切り替える
 		m_sword[(int)SwordType.NormalSword].SetActive(false);
-		m_sword[(int)SwordType.AwakingSword].SetActive(true);
+		m_sword[(int)SwordType.AwakingSword].SetActive(m_awakening);
 	}
 
-	private void NormalTime()
+	private void NormalTime() // 通常時
 	{
 		m_speed = NormalSpeed;
 		m_sword[(int)SwordType.NormalSword].SetActive(true);
-		m_sword[(int)SwordType.AwakingSword].SetActive(false);
+		m_sword[(int)SwordType.AwakingSword].SetActive(m_awakening);
 
-		m_effect[(int)EffectType.SkillActivationCircle].SetActive(false);
+		m_effect[(int)EffectType.SkillActivationCircle].SetActive(m_awakening);
 		m_skillImage.GetComponent<SkillTimer>().CoolDown(false);
 	}
 
 	private void FixedUpdate()
-    {
+	{
 		m_playerHp.value = m_playerHeath;
 
-		if (m_gameSet) return;
-
+		// プレイヤーが死んだら
 		if (m_playerHeath <= 0)
 		{
-			m_animator.SetBool("Death", true);
+			m_isDeath = true;
+			m_animator.SetBool("Death", m_isDeath);
 			m_boss.GetComponent<BossMove>().GameSet(true);
 			OnDeath();
 		}
-		else
-		{
-			if (m_chargeAttack) // チャージ中かつまだ発動していないとき
-			{
-				m_chargeSkill -= Time.deltaTime;
 
-				if (m_chargeSkill <= 0)
-				{
-					m_awakening = true;
-					SkillActivation();              // 発動
-					m_chargeSkill = MaxSkillCharge;
-				}
-			}
-			else
+		if (m_gameSet || m_playerHeath <= 0) return;
+
+		// チャージ中
+		if (m_chargeAttack) 
+		{
+			if (m_playerHeath <= 0) return;
+
+			m_chargeSkill -= Time.deltaTime;
+
+			// チャージ時間が一定時間以上を満たすと覚醒
+			if (m_chargeSkill <= 0) 
 			{
+				m_awakening = true;
+
+				// 発動
+				SkillActivation();   
+				
+
 				m_chargeSkill = MaxSkillCharge;
 			}
+		}
+		else
+		{
+			m_chargeSkill = MaxSkillCharge;
+		}
 
-			if (m_awakening) // 発動中
+		// 発動中
+		if (m_awakening) 
+		{
+			m_skillActivation -= Time.deltaTime;
+
+			if (m_skillActivation <= 0)
 			{
-				m_skillActivation -= Time.deltaTime;
-
-				if (m_skillActivation <= 0)
-				{
-					m_effect[(int)EffectType.SkillActivation].SetActive(false);
-					m_awakening = false;
-					NormalTime();
-					m_skillActivation = MaxSkillActivation;
-				}
+				m_effect[(int)EffectType.SkillActivation].SetActive(false);
+				m_awakening = false;
+				NormalTime();
+				m_skillActivation = MaxSkillActivation;
 			}
+		}
 
-			if (!m_canMove || m_chargeAttack) return;
+		if (!m_canMove || m_chargeAttack) return;
 
-			// カメラの向き(角度[deg])取得
-			var cameraAngleY = m_targetCamera.transform.eulerAngles.y;
+		// カメラの向き(角度[deg])取得
+		var cameraAngleY = m_targetCamera.transform.eulerAngles.y;
 
-			// 操作入力と鉛直方向速度から、現在速度を計算
-			var moveVelocity = new Vector3(
-				m_inputMove.x * m_speed,
-				m_verticalVelocity,
-				m_inputMove.y * m_speed
+		// 操作入力と鉛直方向速度から、現在速度を計算
+		var moveVelocity = new Vector3(
+			m_inputMove.x * m_speed,
+			m_verticalVelocity,
+			m_inputMove.y * m_speed
+		);
+
+		// カメラの角度部分だけ移動量を回転
+		moveVelocity = Quaternion.Euler(0, cameraAngleY, 0) * moveVelocity;
+
+		// 現フレームの移動量を移動速度から計算
+		var moveDelta = moveVelocity * Time.deltaTime;
+
+
+
+		// CharactorControllerに移動量を指定し、オブジェクトを動かす
+		m_characterController.Move(moveDelta);
+
+		if (m_inputMove != Vector2.zero)
+		{
+			m_animator.SetBool("Run", true);
+
+			// 操作入力からY軸周りの目標角度[deg]を計算
+			var targetAngleY = -Mathf.Atan2(m_inputMove.y, m_inputMove.x) * Mathf.Rad2Deg + 90;
+
+			// カメラの角度分だけ振り向く角度を補正
+			targetAngleY += cameraAngleY;
+
+			// イージングしながら次の回転速度[deg]を計算
+			var angleY = Mathf.SmoothDampAngle(
+				m_transform.eulerAngles.y,
+				targetAngleY,
+				ref m_turnVelocity,
+				0.1f
 			);
 
-			// カメラの角度部分だけ移動量を回転
-			moveVelocity = Quaternion.Euler(0, cameraAngleY, 0) * moveVelocity;
-
-			// 現フレームの移動量を移動速度から計算
-			var moveDelta = moveVelocity * Time.deltaTime;
-
-
-
-			// CharactorControllerに移動量を指定し、オブジェクトを動かす
-			m_characterController.Move(moveDelta);
-
-			if (m_inputMove != Vector2.zero)
-			{
-				m_animator.SetBool("Run", true);
-
-				// 操作入力からY軸周りの目標角度[deg]を計算
-				var targetAngleY = -Mathf.Atan2(m_inputMove.y, m_inputMove.x) * Mathf.Rad2Deg + 90;
-
-				// カメラの角度分だけ振り向く角度を補正
-				targetAngleY += cameraAngleY;
-
-				// イージングしながら次の回転速度[deg]を計算
-				var angleY = Mathf.SmoothDampAngle(
-					m_transform.eulerAngles.y,
-					targetAngleY,
-					ref m_turnVelocity,
-					0.1f
-				);
-
-				// オブジェクトの回転を更新
-				m_transform.rotation = Quaternion.Euler(0, angleY, 0);
-			}
+			// オブジェクトの回転を更新
+			m_transform.rotation = Quaternion.Euler(0, angleY, 0);
 		}
 	}
 
 	// 敵からダメージを食らう
 
-	public void HitDamage(int hit) // MagicAttack
+	public void HitDamage(int hit) 
 	{
 		m_playerHeath -= hit;
 	}
@@ -373,5 +384,9 @@ public class PlayerMove : MonoBehaviour
 		if (m_gameSet) return;
 		m_playerLose.GetComponent<GameSetLose>().PlayerLose(true);
 		m_playerDebuffEffect.SetActive(false);
+
+		// 覚醒Effectを消す
+		m_effect[(int)EffectType.SkillActivation].SetActive(false);
+		m_effect[(int)EffectType.SkillActivationCircle].SetActive(false);
 	}
 }

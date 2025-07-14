@@ -8538,6 +8538,49 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 126
   m_CollisionDetection: 0
+--- !u!114 &913981731
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 913981721}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5e5231f7a0e0ea4b933a83cbe9e3d0d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_sounds:
+  - type: 0
+    sound: {fileID: 8300000, guid: a9450f66528c0644992adbef924bc6c3, type: 3}
+  - type: 1
+    sound: {fileID: 8300000, guid: 4369a7a730c402240a2a6e9d0c8ec3b5, type: 3}
+  - type: 2
+    sound: {fileID: 8300000, guid: 04d74e8b836bbad4996e47329aac649e, type: 3}
+  - type: 3
+    sound: {fileID: 8300000, guid: 0d62ec4f1fb37864b97def8c7dcfbea4, type: 3}
+  - type: 4
+    sound: {fileID: 8300000, guid: 3fe5e17630dd2ea429adaaa2c0e38f27, type: 3}
+  - type: 5
+    sound: {fileID: 8300000, guid: 325cb78883af3f249a91f35f1034c4b9, type: 3}
+  - type: 6
+    sound: {fileID: 8300000, guid: 48f816f0e579f0f4ab7030c96cdae87f, type: 3}
+  - type: 7
+    sound: {fileID: 8300000, guid: 6f50120bde4a6f04c92a2e6716d262ef, type: 3}
+  - type: 8
+    sound: {fileID: 8300000, guid: 6e5e4f329b8cfb346b76d863969cb442, type: 3}
+  - type: 9
+    sound: {fileID: 8300000, guid: 461c16cb6038af44a92a9c4678213900, type: 3}
+  - type: 10
+    sound: {fileID: 8300000, guid: 72cc5df62551697489e4ea0a23b40370, type: 3}
+  - type: 11
+    sound: {fileID: 8300000, guid: 0aca02955ce93db4bbb6cc09330cbc00, type: 3}
+  - type: 12
+    sound: {fileID: 8300000, guid: cb32c1094590c874491193b969a89bf1, type: 3}
+  - type: 13
+    sound: {fileID: 8300000, guid: af505ff328c843349918f48b90f864a0, type: 3}
+  - type: 14
+    sound: {fileID: 8300000, guid: 7db9ba3fb85dbbc4dba8682a0f6ac8fa, type: 3}
 --- !u!1001 &924771754
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -21127,6 +21170,12 @@ PrefabInstance:
       objectReference: {fileID: 913981726}
     - target: {fileID: 5401979914765587476, guid: c0aedbfa92c048f418ddc96eb9d7233e,
         type: 3}
+      propertyPath: m_skeleton
+      value: 
+      objectReference: {fileID: 1050765786682887185, guid: 4ad2e7a92d982274883f19777a0b4ff9,
+        type: 3}
+    - target: {fileID: 5401979914765587476, guid: c0aedbfa92c048f418ddc96eb9d7233e,
+        type: 3}
       propertyPath: gameManager
       value: 
       objectReference: {fileID: 333621204}
@@ -21464,6 +21513,11 @@ PrefabInstance:
       objectReference: {fileID: 1830072519}
     - target: {fileID: 5401979914765587476, guid: c0aedbfa92c048f418ddc96eb9d7233e,
         type: 3}
+      propertyPath: m_skeletonpos.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 5401979914765587476, guid: c0aedbfa92c048f418ddc96eb9d7233e,
+        type: 3}
       propertyPath: m_skeltonHead.Array.size
       value: 2
       objectReference: {fileID: 0}
@@ -21543,6 +21597,26 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2004205606245757472, guid: c5144fa452e69964ebc0db40303588c2,
         type: 3}
+    - target: {fileID: 5401979914765587476, guid: c0aedbfa92c048f418ddc96eb9d7233e,
+        type: 3}
+      propertyPath: m_skeletonpos.Array.data[0]
+      value: 
+      objectReference: {fileID: 1215625377}
+    - target: {fileID: 5401979914765587476, guid: c0aedbfa92c048f418ddc96eb9d7233e,
+        type: 3}
+      propertyPath: m_skeletonpos.Array.data[1]
+      value: 
+      objectReference: {fileID: 2056593660}
+    - target: {fileID: 5401979914765587476, guid: c0aedbfa92c048f418ddc96eb9d7233e,
+        type: 3}
+      propertyPath: m_skeletonpos.Array.data[2]
+      value: 
+      objectReference: {fileID: 463152968}
+    - target: {fileID: 5401979914765587476, guid: c0aedbfa92c048f418ddc96eb9d7233e,
+        type: 3}
+      propertyPath: m_skeletonpos.Array.data[3]
+      value: 
+      objectReference: {fileID: 1503302448}
     - target: {fileID: 5401979914765587476, guid: c0aedbfa92c048f418ddc96eb9d7233e,
         type: 3}
       propertyPath: m_skeltonHead.Array.data[0]
@@ -21984,6 +22058,10 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1178072897}
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5417876304558554914, guid: c0aedbfa92c048f418ddc96eb9d7233e,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 913981731}
     - targetCorrespondingSourceObject: {fileID: 5417876304558554914, guid: c0aedbfa92c048f418ddc96eb9d7233e,
         type: 3}
       insertIndex: -1
