@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-	//private bool m_bgmSecond;
 	[SerializeField] AudioClip[] m_audioClip;
 	[SerializeField] AudioSource m_audioSource;
 
@@ -20,11 +19,6 @@ public class GameManager : MonoBehaviour
 		m_audioSource.clip = m_audioClip[0];
 		m_circleFlg = false;
 	}
-
-    void Update()
-    {
-        
-    }
 
 	public void BgmChange()
 	{

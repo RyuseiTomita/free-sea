@@ -5,7 +5,14 @@ using UnityEngine;
 
 public class PlayerAttackHit : MonoBehaviour
 {
-	[SerializeField] AudioClip[] m_clips;
+	private enum SwordType
+	{
+		Normal,
+		Skill,
+	}
+
+
+	[SerializeField] AudioClip m_shieldSound;
 	[SerializeField] List<int> m_damageList;
 	[SerializeField] Collider[] m_collider;
 	[SerializeField] GameObject m_hitEffect;
@@ -16,25 +23,25 @@ public class PlayerAttackHit : MonoBehaviour
 
 	public void OnAttackNormal(int damage)
 	{
-		m_collider[0].enabled = true;
+		m_collider[(int)SwordType.Normal].enabled = true;
 		m_damageIndex = damage;
 	}
 
 	public void OnAttackNormalEnd()
 	{
-		m_collider[0].enabled = false;
+		m_collider[(int)SwordType.Normal].enabled = false;
 		m_damageIndex = 0;
 	}
 
 	public void OnAttackSkill(int damage)
 	{
-		m_collider[1].enabled = true;
+		m_collider[(int)SwordType.Skill].enabled = true;
 		m_damageIndex = damage;
 	}
 
 	public void OnAttackSkillEnd()
 	{
-		m_collider[1].enabled = false;
+		m_collider[(int)SwordType.Skill].enabled = false;
 		m_damageIndex = 0;
 	}
 
@@ -42,8 +49,8 @@ public class PlayerAttackHit : MonoBehaviour
 	{
 		if (other.TryGetComponent<BossMove>(out var health))
 		{
-			m_collider[0].enabled = false;
-			m_collider[1].enabled = false;
+			m_collider[(int)SwordType.Normal].enabled = false;
+			m_collider[(int)SwordType.Skill].enabled = false;
 			other.gameObject.GetComponent<BossMove>().HitAttack(m_damageList[m_damageIndex]);
 			Instantiate(m_hitEffect, other.transform.position + Vector3.up, Quaternion.identity);
 			SoundEffect.Play2D(m_hitSound[m_damageIndex]);
@@ -58,7 +65,7 @@ public class PlayerAttackHit : MonoBehaviour
 
 		if(other.gameObject.CompareTag("Shield"))
 		{
-			SoundEffect.Play2D(m_clips[0]);
+			SoundEffect.Play2D(m_shieldSound);
 			Instantiate(m_hitEffect, other.transform.position + Vector3.up, Quaternion.identity);
 			SoundEffect.Play2D(m_hitSound[m_damageIndex]);
 		}

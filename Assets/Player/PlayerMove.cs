@@ -93,11 +93,6 @@ public class PlayerMove : MonoBehaviour
 		m_animator = GetComponent<Animator>();
 		audioSource = GetComponent<AudioSource>();
 
-		if (m_targetCamera == null)
-		{
-			m_targetCamera = Camera.main;
-		}
-
 		m_chargeAttack = false;
 		m_awakening = false;
 		m_isDeath = false;
@@ -152,8 +147,7 @@ public class PlayerMove : MonoBehaviour
 		{
 			m_animator.SetTrigger("SkillSword");
 			m_canMove = false;
-		}
-		
+		}	
 	}
 
 	public void OnChargeAttack(InputAction.CallbackContext context)

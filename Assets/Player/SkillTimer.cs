@@ -8,8 +8,7 @@ public class SkillTimer : MonoBehaviour
 	[SerializeField] float skillCoolDown;
 	[SerializeField] SkillCoolDown image;
 
-	private const float MaxSkillCoolDown = 14.5f;
-	float seconds;
+	private float seconds;
 
 	private bool m_isCoolDown;
 

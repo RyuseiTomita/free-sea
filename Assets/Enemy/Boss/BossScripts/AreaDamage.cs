@@ -8,11 +8,6 @@ public class AreaDamage : MonoBehaviour
 	[SerializeField] Collider m_collider;
 	[SerializeField] int m_areaAttack;
 
-	private void Start()
-	{
-
-	}
-
 	private void OnTriggerEnter(Collider other)
 	{
 		if(other.gameObject.CompareTag("Player"))

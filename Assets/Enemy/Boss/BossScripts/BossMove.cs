@@ -96,7 +96,7 @@ public class BossMove : MonoBehaviour
 	private static int m_curse;
 
 	// シールド
-	[SerializeField] GameObject m_shield;
+	[SerializeField] GameObject m_shield; 
 	[SerializeField] Collider m_shieldcollider;
 	private bool m_isShield;
 	private bool m_canShield;
@@ -123,6 +123,7 @@ public class BossMove : MonoBehaviour
 
 	// 鎌の攻撃(近接)
 	[SerializeField] float m_takeStandTime; // 溜め時間
+	private const float MaxStandTime = 5f;
 	[SerializeField] Collider m_sickleArea;
 	[SerializeField] GameObject m_sickDrawGauge;
  	private bool m_sickleChage;
@@ -140,6 +141,7 @@ public class BossMove : MonoBehaviour
 	[SerializeField] GameObject m_sickle;  // 鎌の武器
 	private bool m_awakeningMode; // 敵が覚醒中か
 	private int m_graveCount;
+	private const int MaxGrave = 4;
 
 	[SerializeField] GameObject gameManager;
 	[SerializeField] GameObject playerWin;
@@ -263,7 +265,7 @@ public class BossMove : MonoBehaviour
 		if (!m_onMove) return;
 
 
-		// プレイヤーを向く
+		// プレイヤーを向く(Y軸は見ない)
 		Vector3 forward = m_lookPlayer.position - transform.position;
 		forward.Scale(new Vector3(1, 0, 1));
 
@@ -352,7 +354,7 @@ public class BossMove : MonoBehaviour
 				m_bossAttackPattern = (int)AttackPatternType.SkeltonSpawn;
 			}
 
-				m_magicNumber = 0;
+			m_magicNumber = 0;
 			m_magicAttack = false;
 			m_magicCoolDown = 0f;
 			m_onAttack = false;
@@ -534,7 +536,7 @@ public class BossMove : MonoBehaviour
 		if (m_sickleAttack) return;
 		m_takeStandTime += Time.deltaTime;
 		m_sickDrawGauge.GetComponent<SickAreaGauge>().SickAttackDrawTime(true);
-		if (m_takeStandTime >= 5f)
+		if (m_takeStandTime >= MaxStandTime)
 		{
 			m_sickleAttack = true;
 			m_takeStandTime = 0;
@@ -676,7 +678,7 @@ public class BossMove : MonoBehaviour
 	public void ShieldBreak()
 	{
 		m_graveCount++;
-		if (m_graveCount >= 4)
+		if (m_graveCount >= MaxGrave)
 		{
 			SoundEffect.Play2D(m_clip[(int)SoundType.ShieldBreak]);
 			m_bossCollider.enabled = true;
